@@ -41,11 +41,13 @@ if (argv.export) {
     let fileContents = readFiles(fileNames);
 
     // pass the array of file contents to our elm worker
-    let worker = Elm.Main.worker({
-        "languages": [],
-        "sources": fileContents,
-        "operation": "export",
-        "format": argv.format,
+    let worker = Elm.Elm.Main.init({
+				"flags": {
+						"languages": [],
+						"sources": fileContents,
+						"operation": "export",
+						"format": argv.format
+				}
     });
 
     // subscribe to the port to handle completion callback
@@ -68,7 +70,7 @@ if (argv.export) {
     let data = fs.readFileSync(pathToImportFile);
     let csvContent = data.toString();
 
-    let worker = Elm.Main.worker({
+    let worker = Elm.Elm.Main.init({
         "languages": argv.language.split(","),
         "sources": [csvContent],
         "operation": "import",
@@ -88,7 +90,7 @@ if (argv.export) {
     // read all files and store their content in an array
     let fileContents = readFiles(fileNames);
 
-    let worker = Elm.Main.worker({
+    let worker = Elm.Elm.Main.init({
         "sources": fileContents,
         "operation": "genswitch",
         "languages": argv.language.split(","),
