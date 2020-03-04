@@ -35,10 +35,14 @@ type Operation
     | GenSwitch Format
 
 
-port exportResult : String -> Cmd msg
+type alias PathAndContent =
+    ( String, String )
 
 
-port importResult : List ( String, String ) -> Cmd msg
+port exportResult : List PathAndContent -> Cmd msg
+
+
+port importResult : List PathAndContent -> Cmd msg
 
 
 operationFromString : String -> Maybe String -> Operation
@@ -70,7 +74,7 @@ formatFromString maybeFormat =
 
 
 type alias Flags =
-    { sources : List String
+    { sources : List PathAndContent
     , operation : String
     , format : Maybe String
     , languages : Maybe (List String)
@@ -98,8 +102,8 @@ init flags =
             ( {}, operationGenerateSwitch flags.sources flags.languages )
 
 
-operationExport : List String -> Format -> Cmd Never
-operationExport source format =
+operationExport : List PathAndContent -> Format -> Cmd Never
+operationExport sources format =
     let
         exportFunction =
             case format of
@@ -110,15 +114,14 @@ operationExport source format =
                     PO.Export.generate
 
         exportValue =
-            List.map Localized.parse source
-                |> List.concat
-                |> exportFunction
+            sources
+                |> List.map (Tuple.mapSecond (Localized.parse >> exportFunction))
     in
     exportResult exportValue
 
 
-operationImport : List String -> Maybe (List Localized.LangCode) -> Format -> Cmd Never
-operationImport csv mlangs format =
+operationImport : List PathAndContent -> Maybe (List Localized.LangCode) -> Format -> Cmd Never
+operationImport csvs mlangs format =
     let
         lang =
             mlangs |> Maybe.withDefault [] |> List.head |> Maybe.withDefault "Klingon"
@@ -131,22 +134,26 @@ operationImport csv mlangs format =
                 PO ->
                     PO.Import.generate
     in
-    List.head csv
-        |> Maybe.withDefault ""
-        |> importFunction
-        |> List.map (addLanguageToModuleName lang)
-        |> Localized.Writer.generate
-        |> List.map slashifyModuleName
-        |> importResult
+    csvs
+        |> List.map (Tuple.mapSecond importFunction)
+        |> List.map (Tuple.mapSecond <| List.map <| addLanguageToModuleName lang)
+        |> List.map (Tuple.mapSecond Localized.Writer.generate)
+        |> List.map (Tuple.mapSecond <| List.map slashifyModuleName)
+        -- TODO generate po/csv filename here
+        |> List.map Tuple.second
+        |> List.map importResult
+        |> Cmd.batch
 
 
-operationGenerateSwitch : List Localized.SourceCode -> Maybe (List Localized.LangCode) -> Cmd Never
+operationGenerateSwitch : List PathAndContent -> Maybe (List Localized.LangCode) -> Cmd Never
 operationGenerateSwitch sources mlangs =
     let
         locales =
             Maybe.withDefault [] mlangs
     in
-    Localized.Switch.generate locales sources
+    sources
+        |> List.map Tuple.second
+        |> Localized.Switch.generate locales
         |> List.map slashifyModuleName
         |> importResult
 
