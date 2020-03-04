@@ -26,7 +26,7 @@ modulename, key, comment, placeholders, value
 You will usually use this output to create elm code:
 
     CSV.Import.generate csvString
-    |> Localized.Writer.write
+        |> Localized.Writer.write
 
 -}
 generate : String -> List Localized.Module
@@ -60,18 +60,18 @@ generateForCsv lines =
                     )
                 |> Dict.fromList
     in
-        -- Generate the source code for each module based on the lines
-        -- grouped in the expression above.
-        List.map
-            (\name ->
-                let
-                    linesForThisModule =
-                        Dict.get name linesForModules
-                            |> Maybe.withDefault []
-                in
-                    ( name, generateForModule linesForThisModule )
-            )
-            modules
+    -- Generate the source code for each module based on the lines
+    -- grouped in the expression above.
+    List.map
+        (\name ->
+            let
+                linesForThisModule =
+                    Dict.get name linesForModules
+                        |> Maybe.withDefault []
+            in
+            ( name, generateForModule linesForThisModule )
+        )
+        modules
 
 
 generateForModule : List (List String) -> List Localized.Element
@@ -120,10 +120,11 @@ code modulename key comment placeholderString value =
         numPlaceholders =
             List.length placeholders
     in
-        if numPlaceholders == 0 then
-            staticElement modulename key comment value
-        else
-            formatElement modulename key comment placeholders value
+    if numPlaceholders == 0 then
+        staticElement modulename key comment value
+
+    else
+        formatElement modulename key comment placeholders value
 
 
 formatElement : Localized.ModuleName -> Localized.Key -> Localized.Comment -> List Localized.Placeholder -> Localized.Value -> Localized.Element
@@ -142,25 +143,27 @@ formatElement modulename key comment placeholders value =
                                 -- ["p", " Goodbye "] -> [FormatComponentPlaceholder "p", Localized.FormatComponentStatic " Goodbye "]
                                 |> List.indexedMap
                                     (\index submatch ->
-                                        if index % 2 == 0 then
+                                        if modBy index 2 == 0 then
                                             Localized.FormatComponentPlaceholder (String.trim submatch)
+
                                         else
                                             Localized.FormatComponentStatic submatch
                                     )
+
                         else
                             [ Localized.FormatComponentStatic candidate ]
                     )
                 |> List.concat
     in
-        Localized.ElementFormat
-            { meta =
-                { moduleName = modulename
-                , key = key
-                , comment = comment
-                }
-            , placeholders = placeholders
-            , components = components
+    Localized.ElementFormat
+        { meta =
+            { moduleName = modulename
+            , key = key
+            , comment = comment
             }
+        , placeholders = placeholders
+        , components = components
+        }
 
 
 staticElement : Localized.ModuleName -> Localized.Key -> Localized.Comment -> Localized.Value -> Localized.Element

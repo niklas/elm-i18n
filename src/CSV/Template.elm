@@ -7,5 +7,5 @@ headers =
 
 
 placeholder : String -> String
-placeholder placeholder =
-    "{{" ++ placeholder ++ "}}"
+placeholder ph =
+    "{{" ++ ph ++ "}}"

@@ -1,28 +1,4 @@
-module Localized
-    exposing
-        ( Element(ElementStatic, ElementFormat)
-        , Format
-        , FormatComponent
-            ( FormatComponentStatic
-            , FormatComponentPlaceholder
-            )
-        , Meta
-        , Static
-        , ModuleName
-        , Key
-        , Comment
-        , Value
-        , SourceCode
-        , Placeholder
-        , LangCode
-        , Module
-        , ModuleImplementation
-        , elementMeta
-        , languageModuleName
-        , isEmptyFormatComponent
-        , elementRemoveLang
-        , namedModule
-        )
+module Localized exposing (Element(..), Meta, Static, Format, FormatComponent(..), ModuleName, Key, Comment, Value, Placeholder, Module, ModuleImplementation, SourceCode, LangCode, isEmptyFormatComponent, elementMeta, languageModuleName, elementRemoveLang, namedModule)
 
 {-| This module provides data structures describing localized string functions
 and constants.
@@ -101,8 +77,8 @@ allows us to describe strings that contain dynamic values.
 
 "Hello, {{name}}" would be represented as:
 
-    { placeholders : ["name"]
-    , components :
+    { placeholders = [ "name" ]
+    , components =
         [ FormatComponentStatic "Hello, "
         , FormatComponentPlaceholder "name"
         ]
@@ -195,9 +171,9 @@ elementRemoveLang lang element =
         changeName meta name =
             { meta | moduleName = name }
     in
-        case element of
-            ElementStatic e ->
-                ElementStatic { e | meta = changeName e.meta cleanedName }
+    case element of
+        ElementStatic e ->
+            ElementStatic { e | meta = changeName e.meta cleanedName }
 
-            ElementFormat e ->
-                ElementFormat { e | meta = changeName e.meta cleanedName }
+        ElementFormat e ->
+            ElementFormat { e | meta = changeName e.meta cleanedName }

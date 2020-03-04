@@ -9,8 +9,8 @@ elm modules implementing the localized elements.
 -}
 
 import Localized
-import Localized.Writer.Module
 import Localized.Writer.Element
+import Localized.Writer.Module
 
 
 {-| Generate elm-source code for a list of modules and their associated
@@ -27,28 +27,29 @@ moduleImplementation mod =
         ( moduleName, _ ) =
             mod
     in
-        ( moduleName
-        , Localized.Writer.Module.implementation element mod
-        )
+    ( moduleName
+    , Localized.Writer.Module.implementation element mod
+    )
 
 
 element : Localized.Element -> Localized.SourceCode
-element element =
+element ele =
     let
         c =
-            Localized.elementMeta .comment element
+            Localized.elementMeta .comment ele
     in
-        comment c
-            ++ Localized.Writer.Element.typeDeclaration element
-            ++ "\n"
-            ++ Localized.Writer.Element.head element
-            ++ "\n"
-            ++ Localized.Writer.Element.body element
+    comment c
+        ++ Localized.Writer.Element.typeDeclaration ele
+        ++ "\n"
+        ++ Localized.Writer.Element.head ele
+        ++ "\n"
+        ++ Localized.Writer.Element.body ele
 
 
 comment : Localized.Comment -> Localized.SourceCode
 comment string =
     if String.isEmpty string then
         ""
+
     else
         "{-| " ++ string ++ "\n-}\n"

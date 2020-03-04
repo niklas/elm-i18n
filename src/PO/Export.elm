@@ -8,6 +8,7 @@ module PO.Export exposing (generate)
 
 -}
 
+import Flip exposing (flip)
 import Localized
 import PO.Template
 
@@ -62,7 +63,7 @@ identifier modulename key =
 
 staticElement : Localized.Value -> String
 staticElement value =
-    "msgstr " ++ toString value
+    "msgstr " ++ value
 
 
 formatElement : List Localized.FormatComponent -> String
@@ -78,4 +79,3 @@ formatElement list =
                         string
             )
         |> String.join ""
-        |> toString

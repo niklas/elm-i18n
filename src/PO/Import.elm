@@ -25,7 +25,7 @@ key. For example `msgid "Translation.Main.title"` will generate a
 You will usually use this output to create elm code:
 
     PO.Import.generate poString
-    |> Localized.Writer.write
+        |> Localized.Writer.write
 
 -}
 generate : String -> List Localized.Module
@@ -34,12 +34,12 @@ generate poString =
         keysInModules =
             keys poString
     in
-        List.map
-            (\( moduleName, keysInModule ) ->
-                generateModule poString moduleName keysInModule
-                    |> (,) moduleName
-            )
-            keysInModules
+    List.map
+        (\( moduleName, keysInModule ) ->
+            generateModule poString moduleName keysInModule
+                |> Tuple.pair moduleName
+        )
+        keysInModules
 
 
 generateModule : String -> Localized.ModuleName -> List Localized.Key -> List Localized.Element
@@ -57,8 +57,8 @@ generateModule poString moduleName allKeys =
         valueForKey key =
             Dict.get key allValues |> Maybe.withDefault ""
     in
-        List.map
-            (\key ->
-                element moduleName key (valueForKey key) (fullCommentForKey key)
-            )
-            allKeys
+    List.map
+        (\key ->
+            element moduleName key (valueForKey key) (fullCommentForKey key)
+        )
+        allKeys

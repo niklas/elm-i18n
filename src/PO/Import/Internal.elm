@@ -1,20 +1,19 @@
-module PO.Import.Internal
-    exposing
-        ( element
-        , keys
-        , placeholdersFromPoComment
-        , placeholdersInValue
-        , poComments
-        , values
-        )
+module PO.Import.Internal exposing
+    ( element
+    , keys
+    , placeholdersFromPoComment
+    , placeholdersInValue
+    , poComments
+    , values
+    )
 
 import Dict exposing (Dict)
 import Localized
+import PO.Template
 import Regex exposing (Regex)
 import Set
 import String.Extra as String
 import Utils.Regex
-import PO.Template
 
 
 element : Localized.ModuleName -> Localized.Key -> Localized.Value -> Localized.Comment -> Localized.Element
@@ -33,9 +32,11 @@ element moduleName key value fullComment =
             if placeholdersC /= [] then
                 -- It is best if we find the placeholders in the comment as this guarantees the order.
                 placeholdersC
+
             else if placeholdersV /= [] then
                 placeholdersV
                     |> Debug.log "Did not find placeholder list in comment using placeholders found in msgstr instead. Order might be wrong."
+
             else
                 []
 
@@ -48,17 +49,18 @@ element moduleName key value fullComment =
             , comment = comment
             }
     in
-        if List.isEmpty placeholders then
-            Localized.ElementStatic
-                { meta = meta
-                , value = unquotedValue
-                }
-        else
-            Localized.ElementFormat
-                { meta = meta
-                , placeholders = placeholders
-                , components = formatComponentsFromValue unquotedValue placeholders
-                }
+    if List.isEmpty placeholders then
+        Localized.ElementStatic
+            { meta = meta
+            , value = unquotedValue
+            }
+
+    else
+        Localized.ElementFormat
+            { meta = meta
+            , placeholders = placeholders
+            , components = formatComponentsFromValue unquotedValue placeholders
+            }
 
 
 
@@ -77,7 +79,7 @@ keys : String -> List ( Localized.ModuleName, List String )
 keys poString =
     let
         matches =
-            Regex.find Regex.All regexMsgId poString
+            Regex.find regexMsgId poString
 
         moduleAndKeys =
             List.map (\match -> ( Utils.Regex.submatchAt 0 (Just match), Utils.Regex.submatchAt 1 (Just match) )) matches
@@ -96,19 +98,20 @@ keys poString =
                 |> Set.fromList
                 |> Set.toList
     in
-        List.map
-            (\modulename ->
-                List.filterMap
-                    (\( someModule, key ) ->
-                        if modulename == someModule then
-                            Just key
-                        else
-                            Nothing
-                    )
-                    moduleAndKeys
-                    |> (,) modulename
-            )
-            modules
+    List.map
+        (\modulename ->
+            List.filterMap
+                (\( someModule, key ) ->
+                    if modulename == someModule then
+                        Just key
+
+                    else
+                        Nothing
+                )
+                moduleAndKeys
+                |> Tuple.pair modulename
+        )
+        modules
 
 
 
@@ -124,11 +127,11 @@ poComments poString moduleName allKeys =
     allKeys
         |> List.map
             (\key ->
-                Regex.find (Regex.AtMost 1) (regexComments (fullKey moduleName key)) poString
+                Regex.findAtMost 1 (regexComments (fullKey moduleName key)) poString
                     |> List.head
                     |> Utils.Regex.submatchAt 0
                     |> Maybe.withDefault ""
-                    |> (,) key
+                    |> Tuple.pair key
             )
         |> Dict.fromList
 
@@ -141,6 +144,7 @@ commentFromPoComment poComment =
             (\line ->
                 if String.startsWith " i18n:" line then
                     Nothing
+
                 else
                     Just (String.trim line)
             )
@@ -161,21 +165,22 @@ placeholdersFromPoComment poComment =
         placeholdersPrefix =
             " " ++ PO.Template.placeholderCommentPrefix
     in
-        String.trim poComment
-            |> String.split "#."
-            |> List.filterMap
-                (\line ->
-                    if String.startsWith placeholdersPrefix line then
-                        Just
-                            (String.dropLeft (String.length placeholdersPrefix) line
-                                |> String.trim
-                            )
-                    else
-                        Nothing
-                )
-            |> List.head
-            |> Maybe.map (String.split " ")
-            |> Maybe.withDefault []
+    String.trim poComment
+        |> String.split "#."
+        |> List.filterMap
+            (\line ->
+                if String.startsWith placeholdersPrefix line then
+                    Just
+                        (String.dropLeft (String.length placeholdersPrefix) line
+                            |> String.trim
+                        )
+
+                else
+                    Nothing
+            )
+        |> List.head
+        |> Maybe.map (String.split " ")
+        |> Maybe.withDefault []
 
 
 
@@ -190,12 +195,12 @@ values poString moduleName allKeys =
     allKeys
         |> List.map
             (\key ->
-                Regex.find (Regex.AtMost 1) (regexForValue (fullKey moduleName key)) poString
+                Regex.findAtMost 1 (regexForValue (fullKey moduleName key)) poString
                     |> List.head
                     |> Utils.Regex.submatchAt 0
                     |> Maybe.withDefault ""
                     |> String.trim
-                    |> (,) key
+                    |> Tuple.pair key
             )
         |> Dict.fromList
 
@@ -206,7 +211,7 @@ sortine. For this reason, we only use this as a fallback an log an error.
 -}
 placeholdersInValue : Localized.Value -> List Localized.Placeholder
 placeholdersInValue value =
-    Regex.find Regex.All regexForPlaceholder value
+    Regex.find regexForPlaceholder value
         |> List.filterMap (\match -> Utils.Regex.submatchAt 0 (Just match))
 
 
@@ -238,12 +243,12 @@ findPlaceholdersInStaticComponents components placeholders =
                                                 |> List.intersperse (Localized.FormatComponentPlaceholder nextPlaceholder)
                                                 |> List.filter (Localized.isEmptyFormatComponent >> not)
                                     in
-                                        subComponents
+                                    subComponents
                         )
                         components
                         |> List.concat
             in
-                findPlaceholdersInStaticComponents subcomps (List.tail placeholders |> Maybe.withDefault [])
+            findPlaceholdersInStaticComponents subcomps (List.tail placeholders |> Maybe.withDefault [])
 
 
 
@@ -253,24 +258,27 @@ findPlaceholdersInStaticComponents components placeholders =
 regexComments : Localized.Key -> Regex
 regexComments key =
     -- Find all lines preceeding `msgid "key"` that start with `#.`
-    Regex.regex ("((?:#\\.[^\\n]*\\n)*)msgid " ++ toString key)
+    Regex.fromString ("((?:#\\.[^\\n]*\\n)*)msgid " ++ key) |> Maybe.withDefault Regex.never
 
 
 regexForValue : Localized.Key -> Regex
 regexForValue key =
     -- Find all lines succeeding `msgid "key" \nmsgstr` until the two successive white lines
-    Regex.regex
+    Regex.fromString
         ("msgid \"" ++ key ++ "\"\nmsgstr ((?:.+\\r?\\n)+(?=(\\r?\\n)?))")
+        |> Maybe.withDefault Regex.never
 
 
 regexForPlaceholder : Regex
 regexForPlaceholder =
     -- Find all placeholders in a value
-    Regex.regex "%\\(([^\\)]+)\\)s"
+    Regex.fromString "%\\(([^\\)]+)\\)s"
+        |> Maybe.withDefault Regex.never
 
 
 regexMsgId : Regex
 regexMsgId =
     -- Find all msgids split into the last component (separated by dot) and
     -- the first part which is the module.
-    Regex.regex "msgid \"([^\"]+)\\.([^\"]+)\""
+    Regex.fromString "msgid \"([^\"]+)\\.([^\"]+)\""
+        |> Maybe.withDefault Regex.never

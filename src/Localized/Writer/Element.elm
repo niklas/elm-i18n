@@ -1,12 +1,11 @@
-module Localized.Writer.Element
-    exposing
-        ( typeDeclaration
-        , placeholders
-        , body
-        , head
-        , tab
-        , formatComponentsImplementation
-        )
+module Localized.Writer.Element exposing
+    ( body
+    , formatComponentsImplementation
+    , head
+    , placeholders
+    , tab
+    , typeDeclaration
+    )
 
 import Localized
 
@@ -15,7 +14,7 @@ import Localized
 -}
 typeDeclaration : Localized.Element -> Localized.SourceCode
 typeDeclaration element =
-    (Localized.elementMeta .key element)
+    Localized.elementMeta .key element
         ++ " : "
         ++ placeholders element
 
@@ -26,29 +25,28 @@ placeholders element =
         Localized.ElementStatic _ ->
             "String"
 
-        Localized.ElementFormat { placeholders } ->
+        Localized.ElementFormat attr ->
             let
                 num =
-                    List.length placeholders
+                    List.length attr.placeholders
             in
-                String.join " -> " (List.repeat (num + 1) "String")
+            String.join " -> " (List.repeat (num + 1) "String")
 
 
 body : Localized.Element -> Localized.SourceCode
 body element =
     case element of
         Localized.ElementStatic static ->
-            (tab ++ toString static.value)
+            tab ++ static.value
 
         Localized.ElementFormat format ->
-            (List.indexedMap formatComponentsImplementation format.components
+            List.indexedMap formatComponentsImplementation format.components
                 |> String.join "\n"
-            )
 
 
 head : Localized.Element -> Localized.SourceCode
 head element =
-    (Localized.elementMeta .key element)
+    Localized.elementMeta .key element
         ++ (case element of
                 Localized.ElementStatic _ ->
                     ""
@@ -71,12 +69,13 @@ formatComponentsImplementation index component =
         prefix =
             if index == 0 then
                 tab
+
             else
                 tab ++ tab ++ "++ "
     in
-        case component of
-            Localized.FormatComponentStatic string ->
-                prefix ++ toString string
+    case component of
+        Localized.FormatComponentStatic string ->
+            prefix ++ string
 
-            Localized.FormatComponentPlaceholder string ->
-                prefix ++ String.trim string
+        Localized.FormatComponentPlaceholder string ->
+            prefix ++ String.trim string

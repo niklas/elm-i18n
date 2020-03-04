@@ -9,14 +9,15 @@ in the CSV and PO submodules.
 
 import CSV.Export
 import CSV.Import
+import Flip exposing (flip)
 import Json.Decode
 import Localized
 import Localized.Parser as Localized
-import Localized.Writer
 import Localized.Switch
+import Localized.Writer
 import PO.Export
 import PO.Import
-import Platform exposing (programWithFlags)
+import Platform exposing (worker)
 
 
 type alias Model =
@@ -43,15 +44,16 @@ port importResult : List ( String, String ) -> Cmd msg
 operationFromString : String -> Maybe String -> Operation
 operationFromString operation formatString =
     formatFromString formatString
-        |> case operation of
-            "import" ->
-                Import
+        |> (case operation of
+                "import" ->
+                    Import
 
-            "export" ->
-                Export
+                "export" ->
+                    Export
 
-            _ ->
-                GenSwitch
+                _ ->
+                    GenSwitch
+           )
 
 
 formatFromString : Maybe String -> Format
@@ -60,10 +62,11 @@ formatFromString maybeFormat =
         formatString =
             Maybe.map String.toUpper maybeFormat
     in
-        if formatString == Just "PO" then
-            PO
-        else
-            CSV
+    if formatString == Just "PO" then
+        PO
+
+    else
+        CSV
 
 
 type alias Flags =
@@ -79,7 +82,7 @@ in the CSV and PO submodules.
 -}
 main : Program Flags Model Never
 main =
-    programWithFlags { init = init, update = update, subscriptions = always Sub.none }
+    worker { init = init, update = update, subscriptions = always Sub.none }
 
 
 init : Flags -> ( Model, Cmd Never )
@@ -111,7 +114,7 @@ operationExport source format =
                 |> List.concat
                 |> exportFunction
     in
-        exportResult exportValue
+    exportResult exportValue
 
 
 operationImport : List String -> Maybe (List Localized.LangCode) -> Format -> Cmd Never
@@ -128,13 +131,13 @@ operationImport csv mlangs format =
                 PO ->
                     PO.Import.generate
     in
-        List.head csv
-            |> Maybe.withDefault ""
-            |> importFunction
-            |> List.map (addLanguageToModuleName lang)
-            |> Localized.Writer.generate
-            |> List.map slashifyModuleName
-            |> importResult
+    List.head csv
+        |> Maybe.withDefault ""
+        |> importFunction
+        |> List.map (addLanguageToModuleName lang)
+        |> Localized.Writer.generate
+        |> List.map slashifyModuleName
+        |> importResult
 
 
 operationGenerateSwitch : List Localized.SourceCode -> Maybe (List Localized.LangCode) -> Cmd Never
@@ -143,9 +146,9 @@ operationGenerateSwitch sources mlangs =
         locales =
             Maybe.withDefault [] mlangs
     in
-        Localized.Switch.generate locales sources
-            |> List.map slashifyModuleName
-            |> importResult
+    Localized.Switch.generate locales sources
+        |> List.map slashifyModuleName
+        |> importResult
 
 
 update : Never -> Model -> ( Model, Cmd Never )

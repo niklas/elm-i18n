@@ -8,6 +8,7 @@ module CSV.Export exposing (generate)
 -}
 
 import CSV.Template
+import Flip exposing (flip)
 import Localized
 
 

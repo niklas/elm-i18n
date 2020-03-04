@@ -2,8 +2,8 @@ module PO.Template exposing (placeholder, placeholderCommentPrefix)
 
 
 placeholder : String -> String
-placeholder placeholder =
-    "%(" ++ placeholder ++ ")s"
+placeholder ph =
+    "%(" ++ ph ++ ")s"
 
 
 placeholderCommentPrefix : String

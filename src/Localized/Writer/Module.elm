@@ -1,15 +1,15 @@
-module Localized.Writer.Module
-    exposing
-        ( implementation
-        , elements
-        , head
-        , importModule
-        , importModuleExposingAll
-        )
+module Localized.Writer.Module exposing
+    ( elements
+    , head
+    , implementation
+    , importModule
+    , importModuleExposingAll
+    )
 
 {-| Provides code generation for Localized.Modules
 -}
 
+import Flip exposing (flip)
 import Localized
 
 
@@ -23,8 +23,8 @@ implementation functionImplementation mod =
 
 
 elements : (Localized.Element -> Localized.SourceCode) -> Localized.Module -> Localized.SourceCode
-elements functionImplementation ( _, elements ) =
-    List.map functionImplementation elements
+elements functionImplementation ( _, eles ) =
+    List.map functionImplementation eles
         |> String.join "\n\n\n"
         |> String.trim
         |> flip String.append "\n"
