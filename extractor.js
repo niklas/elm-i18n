@@ -9,8 +9,8 @@ const argv = require("yargs")
     .option("import", {alias: "i", describe: "A CSV file to be imported and to generate code from. Generate elm files will be placed in <importOutput>."})
     .option("importOutput", {default: "import", describe: "The base directory to which the generated code should be written. Subdirectories will be created per language and submodule."})
     .option("genswitch", {alias: "s", describe: "Generates Elm modules containing switches for all given languages."})
-    .option("language", {alias: "l", describe: "The language code of the current operation. This should match the subdirectory of the language in root."})
-    .option("root", {default: "Translation", describe: "The root to the translation modules. This script expects this directory to contain a subdirectory for each language."})
+    .option("language", {alias: "l", describe: "The language code of the current operation. This should match a file."})
+    .option("root", {default: "Translation", describe: "The root to the translation modules. This script expects this directory to contain a file for each language."})
     .demand("language")
     .boolean(["export"])
     .help()
@@ -32,14 +32,15 @@ if (argv.exportOutput == "export") {
 const currentDir = process.cwd();
 
 if (argv.export) {
-    let fullPath = path.join(currentDir, argv.root, argv.language);
+    let fullPath = path.join(currentDir, argv.root);
     console.log("Parsing from", fullPath);
-    let fileNames = glob.sync(fullPath + "/**/*.elm");
-    console.log("└── Found elm module files for export:", fileNames);
+    let fileNames = glob.sync(fullPath + "/**/{" + argv.language + "}.elm");
+    console.log("└── Found elm module files for export");
 
     // read all files and store their content in an array
     let fileContents = [];
     fileNames.forEach(function(file) {
+				console.log("  └─ " + file)
         let data = fs.readFileSync(file);
         let content = data.toString();
         fileContents.push(content);
@@ -124,7 +125,7 @@ function handleExport(resultString) {
 
     let targetPath = path.join(currentDir, argv.exportOutput);
     fs.writeFileSync(targetPath, resultString);
-    console.log("Finished writing csv file to:", targetPath);
+    console.log("Finished writing file to:", targetPath);
 }
 
 /**
