@@ -13,10 +13,7 @@ const argv = require("yargs")
     .demand(["language"])
     .argv;
 const fs = require("fs-extra");
-const glob = require("glob");
 const path = require("path");
-const prompt = require("prompt");
-const symlinkOrCopySync = require("symlink-or-copy").sync;
 
 const currentDir = process.cwd();
 
@@ -24,58 +21,22 @@ const currentDir = process.cwd();
 const baseDir = path.join(currentDir, argv.src, argv.rootModule);
 
 // check if language exists
-const languageDir = path.join(currentDir, argv.rootModule, argv.language);
+const languageDir = path.join(currentDir, argv.src, argv.rootModule);
+
 if (!fs.existsSync(languageDir)) {
     console.error("Language module not found", languageDir);
     process.exit(1);
 }
 
-// check if base dir exists and delete if needed (after prompt)
-if (fs.existsSync(baseDir)) {
-    if (!argv.yes) {
-        prompt.start();
-        console.log("There already is a translation at", baseDir);
-        console.log("Should I continue and replace it with <" + argv.language + ">?");
-        console.log("(use command line argument --yes to skip this prompt)");
-        console.log("enter 'y' to continue");
-
-        prompt.get(["remove"], function(err, result) {
-            if (result.remove !== "y") {
-                console.log("aborting");
-                process.exit(1);
-            }
-
-            fs.removeSync(baseDir);
-            main();
-        });
-    } else {
-        fs.removeSync(baseDir);
-        main();
-    }
-} else {
-    main();
-}
+main();
 
 /**
  * main - Copies/symlinks the language into place
  */
 function main() {
-    console.log("Will create symlink from " + languageDir + " to " + baseDir);
-    let relativeLanguageDir = path.relative(currentDir, languageDir);
-    let relativeBaseDir = path.relative(currentDir, baseDir);
-    console.log("Using relative paths " + relativeLanguageDir + " to " + relativeBaseDir);
-    symlinkOrCopySync(relativeLanguageDir, relativeBaseDir);
-
-    // clean out elm-stuff cache
-    glob(path.join(currentDir, "/elm-stuff/**/user/project/*/"+argv.rootModule+"*"), function(er, files) {
-        files.forEach(function(file) {
-            console.log("clearing out cache at", file);
-            fs.removeSync(file);
-        });
-        if (argv.output) {
-            build(argv.output);
-        }
-    });
+		if (argv.output) {
+				build(argv.output);
+		}
 }
 
 
