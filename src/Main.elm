@@ -12,6 +12,7 @@ import CSV.Import
 import Flip exposing (flip)
 import Json.Decode
 import Localized
+import Localized.Filename as Filename
 import Localized.Parser as Localized
 import Localized.Switch
 import Localized.Writer
@@ -113,9 +114,18 @@ operationExport sources format =
                 PO ->
                     PO.Export.generate
 
+        filenameFunction =
+            case format of
+                CSV ->
+                    Filename.toCSV
+
+                PO ->
+                    Filename.toPO
+
         exportValue =
             sources
                 |> List.map (Tuple.mapSecond (Localized.parse >> exportFunction))
+                |> List.map (Tuple.mapFirst filenameFunction)
     in
     exportResult exportValue
 
