@@ -34,11 +34,9 @@ const currentDir = process.cwd();
 if (argv.export) {
     let fullPath = path.join(currentDir, argv.root);
     console.log("Parsing from", fullPath);
-    let fileNames = glob.sync(fullPath + "/**/{" + argv.language + "}.elm");
-    console.log("└── Found elm module files for export:\n" + fileNames.join("\n"));
 
     // read all files and store their content in an array
-    let fileContents = readFiles(fileNames);
+    let fileContents = readFiles(fullPath, "/**/{" + argv.language + "}.elm");
 
     // pass the array of file contents to our elm worker
     let worker = Elm.Elm.Main.init({
@@ -144,8 +142,8 @@ function handleImport(results, importDir) {
 }
 
 
-function readFiles(fileNames) {
-		return fileNames.map(function(file) {
-				return [file, fs.readFileSync(file).toString()];
+function readFiles(basePath, pattern) {
+		return glob.sync(basePath + pattern).map(function(file) {
+				return [path.relative(basePath, file), fs.readFileSync(file).toString()];
 		});
 }
