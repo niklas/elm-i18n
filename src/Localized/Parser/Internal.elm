@@ -56,8 +56,11 @@ stringDeclarations source =
             (\match ->
                 -- The submatches contain the key (at head)
                 -- and the parameters as string (or empty) at index 1.
-                case ( List.head match.submatches, List.getAt 1 match.submatches ) of
-                    ( Just (Just key), Just (Just parametersString) ) ->
+                case match.submatches of
+                    [ Just key, Nothing ] ->
+                        Just ( key, [] )
+
+                    [ Just key, Just parametersString ] ->
                         let
                             parameters =
                                 String.split " -> " parametersString

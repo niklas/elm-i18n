@@ -124,7 +124,8 @@ operationExport sources format =
 
         exportValue =
             sources
-                |> List.map (Tuple.mapSecond (Localized.parse >> exportFunction))
+                |> List.map (Tuple.mapSecond Localized.parse)
+                |> List.map (Tuple.mapSecond exportFunction)
                 |> List.map (Tuple.mapFirst filenameFunction)
     in
     exportResult exportValue
