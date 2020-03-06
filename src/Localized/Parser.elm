@@ -22,14 +22,14 @@ parse source =
         moduleName =
             findModuleName source
     in
-        List.filterMap
-            (\( key, _ ) ->
-                case findStaticElementForKey moduleName source key of
-                    Just simple ->
-                        Just simple
+    List.filterMap
+        (\( key, _ ) ->
+            case findStaticElementForKey moduleName source key of
+                Just simple ->
+                    Just simple
 
-                    Nothing ->
-                        -- try format
-                        findFormatElementForKey moduleName source key
-            )
-            stringKeysAndParameters
+                Nothing ->
+                    -- try format
+                    findFormatElementForKey moduleName source key
+        )
+        stringKeysAndParameters
