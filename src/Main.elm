@@ -40,7 +40,7 @@ type alias PathAndContent =
     ( String, String )
 
 
-port exportResult : List PathAndContent -> Cmd msg
+port exportResult : PathAndContent -> Cmd msg
 
 
 port importResult : List PathAndContent -> Cmd msg
@@ -121,14 +121,13 @@ operationExport sources format =
 
                 PO ->
                     Filename.toPO
-
-        exportValue =
-            sources
-                |> List.map (Tuple.mapSecond Localized.parse)
-                |> List.map (Tuple.mapSecond exportFunction)
-                |> List.map (Tuple.mapFirst filenameFunction)
     in
-    exportResult exportValue
+    sources
+        |> List.map (Tuple.mapSecond Localized.parse)
+        |> List.map (Tuple.mapSecond exportFunction)
+        |> List.map (Tuple.mapFirst filenameFunction)
+        |> List.map exportResult
+        |> Cmd.batch
 
 
 operationImport : List PathAndContent -> Maybe (List Localized.LangCode) -> Format -> Cmd Never

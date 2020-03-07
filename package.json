@@ -17,6 +17,7 @@
     "elm-test": "^0.18.7",
     "fs-extra": "^2.1.2",
     "glob": "^7.1.1",
+    "mkdirp": "^1.0.3",
     "prompt": "^1.0.0",
     "symlink-or-copy": "^1.1.8",
     "yargs": "^7.0.2"

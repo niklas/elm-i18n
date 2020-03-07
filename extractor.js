@@ -19,6 +19,7 @@ const Elm = require("./dist/elm.js");
 const fs = require("fs-extra");
 const path = require("path");
 const glob = require("glob");
+const mkdirp = require("mkdirp");
 
 if (!argv.export && !argv.import && !argv.genswitch) {
     console.error("Please provide import, export or genswitch option");
@@ -49,9 +50,7 @@ if (argv.export) {
     });
 
     // subscribe to the port to handle completion callback
-    worker.ports.exportResult.subscribe(function(resultString) {
-        handleExport(resultString);
-    });
+    worker.ports.exportResult.subscribe(handleExport);
 } else if (argv.import) {
     // ensure that import is a valid file path
     if (!argv.import || argv.import == "" || argv.import == true) {
@@ -107,12 +106,13 @@ if (argv.export) {
  *
  * @param  {String} resultString A CSV string of all translations.
  */
-function handleExport(resultString) {
+function handleExport([filePath, resultString]) {
     if (resultString === "") {
         process.exit(500);
     }
 
-    let targetPath = path.join(currentDir, argv.exportOutput);
+    let targetPath = path.join(currentDir, argv.exportOutput, filePath);
+		mkdirp.sync(path.dirname(targetPath));
     fs.writeFileSync(targetPath, resultString);
     console.log("Finished writing file to:", targetPath);
 }
