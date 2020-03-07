@@ -23,7 +23,7 @@ regexStringDeclarations =
 
 regexSimpleStringValue : String -> Regex
 regexSimpleStringValue key =
-    regex (key ++ "[\\s|\\n]*=[\\s|\\n]*\"(.*)\"")
+    regex (key ++ "[\\s|\\n]*=[\\s|\\n]*(\".*\")")
 
 
 regexStringComment : String -> Regex
@@ -80,6 +80,10 @@ findStaticElementForKey moduleName source key =
             Regex.findAtMost 1 (regexSimpleStringValue key) source
                 |> List.head
                 |> Utils.submatchAt 0
+                -- The capture groups in Elm Kernel's Regex lib cannot match empty strings, they return Nothing instead of Just ""
+                -- https://github.com/elm/regex/issues/5
+                -- That's why we had to add the quotation marks into the capture group and remove them here again. Thx evancz.
+                |> Maybe.map (String.slice 1 -1)
     in
     case maybeValue of
         Just value ->
