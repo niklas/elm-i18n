@@ -11,6 +11,7 @@ module PO.Export exposing (generate)
 import Flip exposing (flip)
 import Localized
 import PO.Template
+import String.Extra
 
 
 {-| Generate a PO string from a list of localized elements (Localized.Element).
@@ -63,7 +64,7 @@ identifier modulename key =
 
 staticElement : Localized.Value -> String
 staticElement value =
-    "msgstr " ++ value
+    "msgstr " ++ String.Extra.quote value
 
 
 formatElement : List Localized.FormatComponent -> String
@@ -79,3 +80,4 @@ formatElement list =
                         string
             )
         |> String.join ""
+        |> String.Extra.quote

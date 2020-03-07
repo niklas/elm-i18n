@@ -8,6 +8,7 @@ module Localized.Writer.Element exposing
     )
 
 import Localized
+import String.Extra
 
 
 {-| Returns types of an translation element, ie. "helloWord : String"
@@ -37,7 +38,7 @@ body : Localized.Element -> Localized.SourceCode
 body element =
     case element of
         Localized.ElementStatic static ->
-            tab ++ static.value
+            tab ++ String.Extra.quote static.value
 
         Localized.ElementFormat format ->
             List.indexedMap formatComponentsImplementation format.components
@@ -75,7 +76,7 @@ formatComponentsImplementation index component =
     in
     case component of
         Localized.FormatComponentStatic string ->
-            prefix ++ string
+            prefix ++ String.Extra.quote string
 
         Localized.FormatComponentPlaceholder string ->
             prefix ++ String.trim string

@@ -28,9 +28,9 @@ testPlaceholders : Test
 testPlaceholders =
     test "testPlaceholders" <|
         \() ->
-            [ PO.placeholdersInValue (toString "Prefix %(placeholder)s")
-            , PO.placeholdersInValue (toString "Prefix %(placeholder)")
-            , PO.placeholdersInValue (toString "%(some)s")
+            [ PO.placeholdersInValue "Prefix %(placeholder)s"
+            , PO.placeholdersInValue "Prefix %(placeholder)"
+            , PO.placeholdersInValue "%(some)s"
             ]
                 |> Expect.equal
                     [ [ "placeholder" ]

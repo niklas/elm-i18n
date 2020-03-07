@@ -12,7 +12,7 @@ import Localized
 import PO.Template
 import Regex exposing (Regex)
 import Set
-import String.Extra as String
+import String.Extra
 import Utils.Regex
 
 
@@ -41,7 +41,7 @@ element moduleName key value fullComment =
                 []
 
         unquotedValue =
-            String.unquote value
+            String.Extra.unquote value
 
         meta =
             { moduleName = moduleName
@@ -258,7 +258,7 @@ findPlaceholdersInStaticComponents components placeholders =
 regexComments : Localized.Key -> Regex
 regexComments key =
     -- Find all lines preceeding `msgid "key"` that start with `#.`
-    Regex.fromString ("((?:#\\.[^\\n]*\\n)*)msgid " ++ key) |> Maybe.withDefault Regex.never
+    Regex.fromString ("((?:#\\.[^\\n]*\\n)*)msgid " ++ String.Extra.quote key) |> Maybe.withDefault Regex.never
 
 
 regexForValue : Localized.Key -> Regex
