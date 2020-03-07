@@ -143,7 +143,7 @@ formatElement modulename key comment placeholders value =
                                 -- ["p", " Goodbye "] -> [FormatComponentPlaceholder "p", Localized.FormatComponentStatic " Goodbye "]
                                 |> List.indexedMap
                                     (\index submatch ->
-                                        if modBy index 2 == 0 then
+                                        if modBy 2 index == 0 then
                                             Localized.FormatComponentPlaceholder (String.trim submatch)
 
                                         else
