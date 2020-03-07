@@ -79,7 +79,11 @@ elements =
 
 inputPO : String
 inputPO =
-    """#. MyComment
+    """msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\\n"
+"X-Poedit-SourceCharset: UTF-8\\n"
+#. MyComment
 msgid "Test.myString"
 msgstr "Value"
 

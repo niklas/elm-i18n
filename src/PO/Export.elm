@@ -27,6 +27,7 @@ generate elements =
     List.map line elements
         |> String.join "\n\n"
         |> flip String.append "\n"
+        |> String.append forceUTF8
 
 
 line : Localized.Element -> String
@@ -81,3 +82,12 @@ formatElement list =
             )
         |> String.join ""
         |> String.Extra.quote
+
+
+forceUTF8 : String
+forceUTF8 =
+    """msgid ""
+msgstr ""
+"Content-Type: text/plain; charset=UTF-8\\n"
+"X-Poedit-SourceCharset: UTF-8\\n"
+"""
