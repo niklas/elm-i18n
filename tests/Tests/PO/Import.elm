@@ -12,7 +12,7 @@ testImport =
     test "testImport" <|
         \() ->
             PO.generate inputPO
-                |> Expect.equal [ ( "Translation.Test", elements ) ]
+                |> Expect.equal [ ( "Test", elements ) ]
 
 
 testKeys : Test
@@ -21,7 +21,7 @@ testKeys =
         \() ->
             PO.keys inputPO
                 |> Expect.equal
-                    [ ( "Translation.Test", [ "myString", "myFormat" ] ) ]
+                    [ ( "Test", [ "myString", "myFormat" ] ) ]
 
 
 testPlaceholders : Test
@@ -56,7 +56,7 @@ elements : List Localized.Element
 elements =
     [ Localized.ElementStatic
         { meta =
-            { moduleName = "Translation.Test"
+            { moduleName = "Test"
             , key = "myString"
             , comment = "MyComment"
             }
@@ -64,7 +64,7 @@ elements =
         }
     , Localized.ElementFormat
         { meta =
-            { moduleName = "Translation.Test"
+            { moduleName = "Test"
             , key = "myFormat"
             , comment = ""
             }
@@ -80,11 +80,11 @@ elements =
 inputPO : String
 inputPO =
     """#. MyComment
-msgid "Translation.Test.myString"
+msgid "Test.myString"
 msgstr "Value"
 
 #.
 #. i18n: placeholders: label
-msgid "Translation.Test.myFormat"
+msgid "Test.myFormat"
 msgstr "Prefix: %(label)s"
 """

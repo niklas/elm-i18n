@@ -33,6 +33,7 @@ elements functionImplementation ( _, eles ) =
 head : Localized.Module -> Localized.SourceCode
 head ( name, _ ) =
     "module "
+        ++ "Translation."
         ++ name
         ++ " exposing (..)\n\n{-| -}\n\n"
 

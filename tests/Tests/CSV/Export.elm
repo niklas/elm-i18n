@@ -19,7 +19,7 @@ elements : List Localized.Element
 elements =
     [ Localized.ElementStatic
         { meta =
-            { moduleName = "Translation.Second"
+            { moduleName = "Second"
             , key = "myString"
             , comment = "MyComment"
             }
@@ -27,7 +27,7 @@ elements =
         }
     , Localized.ElementFormat
         { meta =
-            { moduleName = "Translation.Test"
+            { moduleName = "Test"
             , key = "myFormat"
             , comment = ""
             }
@@ -43,6 +43,6 @@ elements =
 expectedCSV : String
 expectedCSV =
     CSV.Template.headers ++ """
-"Translation.Second","myString","MyComment","","Value"
-"Translation.Test","myFormat","","label","Prefix: {{label}}"
+"Second","myString","MyComment","","Value"
+"Test","myFormat","","label","Prefix: {{label}}"
 """

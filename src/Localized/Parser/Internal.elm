@@ -13,7 +13,7 @@ regex string =
 
 regexFindModuleName : Regex
 regexFindModuleName =
-    regex "module ([^\\s]*) exposing"
+    regex "module Translation\\.([^\\s]*) exposing"
 
 
 regexStringDeclarations : Regex

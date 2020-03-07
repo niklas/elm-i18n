@@ -15,7 +15,7 @@ testGenerate =
     test "testGenerate" <|
         \() ->
             CSV.generate inputCSV
-                |> Expect.equal [ ( "Translation.Test", elements ) ]
+                |> Expect.equal [ ( "Test", elements ) ]
 
 
 testImport : Test
@@ -24,7 +24,7 @@ testImport =
         \() ->
             CSV.generate inputCSV
                 |> Writer.generate
-                |> Expect.equal [ ( "Translation.Test", expectedSource ) ]
+                |> Expect.equal [ ( "Test", expectedSource ) ]
 
 
 testFullCircle : Test
@@ -35,17 +35,17 @@ testFullCircle =
                 |> Export.generate
                 |> CSV.generate
                 |> Writer.generate
-                |> Expect.equal [ ( "Translation.Test", expectedSource ) ]
+                |> Expect.equal [ ( "Test", expectedSource ) ]
 
 
 inputCSV : String
 inputCSV =
     CSV.Template.headers
         ++ """
-"Translation.Test","myString","My comment","","Value","IGNORE"
-"Translation.Test","myFormat","","label","Prefix: {{label}}"
-"Translation.Test","myFormatAtBeginning","","label","{{label}} suffix","IGNORE","IGNORE"
-"Translation.Test","myFormatQuoted","","label","Prefix '{{label}}' suffix"
+"Test","myString","My comment","","Value","IGNORE"
+"Test","myFormat","","label","Prefix: {{label}}"
+"Test","myFormatAtBeginning","","label","{{label}} suffix","IGNORE","IGNORE"
+"Test","myFormatQuoted","","label","Prefix '{{label}}' suffix"
 """
 
 
@@ -87,7 +87,7 @@ elements : List Localized.Element
 elements =
     [ Localized.ElementStatic
         { meta =
-            { moduleName = "Translation.Test"
+            { moduleName = "Test"
             , key = "myString"
             , comment = "My comment"
             }
@@ -95,7 +95,7 @@ elements =
         }
     , Localized.ElementFormat
         { meta =
-            { moduleName = "Translation.Test"
+            { moduleName = "Test"
             , key = "myFormat"
             , comment = ""
             }
@@ -107,7 +107,7 @@ elements =
         }
     , Localized.ElementFormat
         { meta =
-            { moduleName = "Translation.Test"
+            { moduleName = "Test"
             , key = "myFormatAtBeginning"
             , comment = ""
             }
@@ -119,7 +119,7 @@ elements =
         }
     , Localized.ElementFormat
         { meta =
-            { moduleName = "Translation.Test"
+            { moduleName = "Test"
             , key = "myFormatQuoted"
             , comment = ""
             }

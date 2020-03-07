@@ -18,7 +18,7 @@ elements : List Localized.Element
 elements =
     [ Localized.ElementStatic
         { meta =
-            { moduleName = "Translation.Test"
+            { moduleName = "Test"
             , key = "myString"
             , comment = "MyComment"
             }
@@ -26,7 +26,7 @@ elements =
         }
     , Localized.ElementStatic
         { meta =
-            { moduleName = "Translation.Second"
+            { moduleName = "Second"
             , key = "myString"
             , comment = "Multiline\ncomment"
             }
@@ -34,7 +34,7 @@ elements =
         }
     , Localized.ElementFormat
         { meta =
-            { moduleName = "Translation.Test"
+            { moduleName = "Test"
             , key = "myFormat"
             , comment = ""
             }
@@ -50,16 +50,16 @@ elements =
 expectedPO : String
 expectedPO =
     """#. MyComment
-msgid "Translation.Test.myString"
+msgid "Test.myString"
 msgstr "Value"
 
 #. Multiline
 #. comment
-msgid "Translation.Second.myString"
+msgid "Second.myString"
 msgstr "Value"
 
 #.
 #. i18n: placeholders: label
-msgid "Translation.Test.myFormat"
+msgid "Test.myFormat"
 msgstr "Prefix: %(label)s"
 """

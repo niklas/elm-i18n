@@ -93,7 +93,7 @@ expected =
 
 mockModuleName : String
 mockModuleName =
-    "Translation.Test"
+    "Test"
 
 
 sourceString : String
