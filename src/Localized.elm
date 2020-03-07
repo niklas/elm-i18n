@@ -155,21 +155,26 @@ namedModule name =
     ( name, [] )
 
 
-{-| Removes a locale "En" from a module name like "Translation.Main.En"
+{-| Removes a locale "En" from a module name like "Area.Foo.En"
 -}
-elementRemoveLang : LangCode -> Element -> Element
-elementRemoveLang lang =
+elementRemoveLang : Element -> Element
+elementRemoveLang =
     elementUpdateMeta
         (\meta ->
             let
                 newName =
                     meta.moduleName
                         |> String.split "."
-                        |> List.filter (\p -> p /= lang)
+                        |> listDropRight 1
                         |> String.join "."
             in
             { meta | moduleName = newName }
         )
+
+
+listDropRight : Int -> List a -> List a
+listDropRight n =
+    List.reverse << List.drop 1 << List.reverse
 
 
 elementUpdateMeta : (Meta -> Meta) -> Element -> Element

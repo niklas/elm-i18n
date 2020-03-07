@@ -162,6 +162,10 @@ mainModule languages =
     )
 
 
+
+-- TODO we do not have to pass langs here, they are always the last element of the elm module name
+
+
 removeLocale : List Localized.LangCode -> Localized.Element -> Localized.Element
 removeLocale langs element =
-    langs |> List.foldr Localized.elementRemoveLang element
+    Localized.elementRemoveLang element

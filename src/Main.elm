@@ -124,6 +124,7 @@ operationExport sources format =
     in
     sources
         |> List.map (Tuple.mapSecond Localized.parse)
+        |> List.map (Tuple.mapSecond <| List.map Localized.elementRemoveLang)
         |> List.map (Tuple.mapSecond exportFunction)
         |> List.map (Tuple.mapFirst filenameFunction)
         |> List.map (Tuple.mapFirst Filename.lastSegmentFirst)
