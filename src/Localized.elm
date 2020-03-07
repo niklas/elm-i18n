@@ -158,22 +158,25 @@ namedModule name =
 {-| Removes a locale "En" from a module name like "Translation.Main.En"
 -}
 elementRemoveLang : LangCode -> Element -> Element
-elementRemoveLang lang element =
-    let
-        moduleName =
-            elementMeta .moduleName element
+elementRemoveLang lang =
+    elementUpdateMeta
+        (\meta ->
+            let
+                newName =
+                    meta.moduleName
+                        |> String.split "."
+                        |> List.filter (\p -> p /= lang)
+                        |> String.join "."
+            in
+            { meta | moduleName = newName }
+        )
 
-        cleanedName =
-            String.split "." moduleName
-                |> List.filter (\p -> p /= lang)
-                |> String.join "."
 
-        changeName meta name =
-            { meta | moduleName = name }
-    in
+elementUpdateMeta : (Meta -> Meta) -> Element -> Element
+elementUpdateMeta fun element =
     case element of
         ElementStatic e ->
-            ElementStatic { e | meta = changeName e.meta cleanedName }
+            ElementStatic { e | meta = fun e.meta }
 
         ElementFormat e ->
-            ElementFormat { e | meta = changeName e.meta cleanedName }
+            ElementFormat { e | meta = fun e.meta }
