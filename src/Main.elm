@@ -126,6 +126,7 @@ operationExport sources format =
         |> List.map (Tuple.mapSecond Localized.parse)
         |> List.map (Tuple.mapSecond exportFunction)
         |> List.map (Tuple.mapFirst filenameFunction)
+        |> List.map (Tuple.mapFirst Filename.lastSegmentFirst)
         |> List.map exportResult
         |> Cmd.batch
 
