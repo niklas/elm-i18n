@@ -26,8 +26,12 @@ if (!argv.export && !argv.import && !argv.genswitch) {
     process.exit(403);
 }
 
+if (argv.format) {
+		argv.format = argv.format.toLowerCase();
+}
+
 if (argv.exportOutput == "export") {
-    argv.exportOutput = argv.exportOutput + "." + argv.format.toLowerCase();
+    argv.exportOutput = argv.exportOutput + "." + argv.format;
 }
 
 const currentDir = process.cwd();
