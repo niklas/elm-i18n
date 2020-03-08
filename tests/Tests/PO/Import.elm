@@ -5,6 +5,7 @@ import Localized
 import PO.Import as PO
 import PO.Import.Internal as PO
 import Test exposing (..)
+import Tests.Fixtures as Fixtures
 
 
 testImport : Test
@@ -54,41 +55,9 @@ testPlaceholdersFromComment =
 
 elements : List Localized.Element
 elements =
-    [ Localized.ElementStatic
-        { meta =
-            { moduleName = "Test"
-            , key = "myString"
-            , comment = "MyComment"
-            }
-        , value = "Value"
-        }
-    , Localized.ElementFormat
-        { meta =
-            { moduleName = "Test"
-            , key = "myFormat"
-            , comment = ""
-            }
-        , placeholders = [ "label" ]
-        , components =
-            [ Localized.FormatComponentStatic "Prefix: "
-            , Localized.FormatComponentPlaceholder "label"
-            ]
-        }
-    ]
+    Fixtures.elements
 
 
 inputPO : String
 inputPO =
-    """msgid ""
-msgstr ""
-"Content-Type: text/plain; charset=UTF-8\\n"
-"X-Poedit-SourceCharset: UTF-8\\n"
-#. MyComment
-msgid "Test.myString"
-msgstr "Value"
-
-#.
-#. i18n: placeholders: label
-msgid "Test.myFormat"
-msgstr "Prefix: %(label)s"
-"""
+    Fixtures.po

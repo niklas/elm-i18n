@@ -8,6 +8,7 @@ import Localized
 import Localized.Parser as Localized
 import Localized.Writer as Writer
 import Test exposing (..)
+import Tests.Fixtures as Fixtures
 
 
 testGenerate : Test
@@ -40,94 +41,14 @@ testFullCircle =
 
 inputCSV : String
 inputCSV =
-    CSV.Template.headers
-        ++ """
-"Test","myString","My comment","","Value","IGNORE"
-"Test","myFormat","","label","Prefix: {{label}}"
-"Test","myFormatAtBeginning","","label","{{label}} suffix","IGNORE","IGNORE"
-"Test","myFormatQuoted","","label","Prefix '{{label}}' suffix"
-"""
+    Fixtures.csv4
 
 
 expectedSource : String
 expectedSource =
-    """module Translation.Test exposing (..)
-
-{-| -}
-
-
-{-| My comment
--}
-myString : String
-myString =
-    "Value"
-
-
-myFormat : String -> String
-myFormat label =
-    "Prefix: "
-        ++ label
-
-
-myFormatAtBeginning : String -> String
-myFormatAtBeginning label =
-    label
-        ++ " suffix"
-
-
-myFormatQuoted : String -> String
-myFormatQuoted label =
-    "Prefix '"
-        ++ label
-        ++ "' suffix"
-"""
+    Fixtures.elm4
 
 
 elements : List Localized.Element
 elements =
-    [ Localized.ElementStatic
-        { meta =
-            { moduleName = "Test"
-            , key = "myString"
-            , comment = "My comment"
-            }
-        , value = "Value"
-        }
-    , Localized.ElementFormat
-        { meta =
-            { moduleName = "Test"
-            , key = "myFormat"
-            , comment = ""
-            }
-        , placeholders = [ "label" ]
-        , components =
-            [ Localized.FormatComponentStatic "Prefix: "
-            , Localized.FormatComponentPlaceholder "label"
-            ]
-        }
-    , Localized.ElementFormat
-        { meta =
-            { moduleName = "Test"
-            , key = "myFormatAtBeginning"
-            , comment = ""
-            }
-        , placeholders = [ "label" ]
-        , components =
-            [ Localized.FormatComponentPlaceholder "label"
-            , Localized.FormatComponentStatic " suffix"
-            ]
-        }
-    , Localized.ElementFormat
-        { meta =
-            { moduleName = "Test"
-            , key = "myFormatQuoted"
-            , comment = ""
-            }
-        , placeholders = [ "label" ]
-        , components =
-            [ Localized.FormatComponentStatic "Prefix '"
-            , Localized.FormatComponentPlaceholder "label"
-            , Localized.FormatComponentStatic "' suffix"
-            ]
-        }
-    ]
+    Fixtures.elements4

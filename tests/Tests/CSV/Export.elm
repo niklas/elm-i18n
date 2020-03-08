@@ -1,10 +1,10 @@
 module Tests.CSV.Export exposing (..)
 
 import CSV.Export as CSV
-import CSV.Template
 import Expect
 import Localized
 import Test exposing (..)
+import Tests.Fixtures as Fixtures
 
 
 testExport : Test
@@ -17,32 +17,9 @@ testExport =
 
 elements : List Localized.Element
 elements =
-    [ Localized.ElementStatic
-        { meta =
-            { moduleName = "Second"
-            , key = "myString"
-            , comment = "MyComment"
-            }
-        , value = "Value"
-        }
-    , Localized.ElementFormat
-        { meta =
-            { moduleName = "Test"
-            , key = "myFormat"
-            , comment = ""
-            }
-        , placeholders = [ "label" ]
-        , components =
-            [ Localized.FormatComponentStatic "Prefix: "
-            , Localized.FormatComponentPlaceholder "label"
-            ]
-        }
-    ]
+    Fixtures.elements3
 
 
 expectedCSV : String
 expectedCSV =
-    CSV.Template.headers ++ """
-"Second","myString","MyComment","","Value"
-"Test","myFormat","","label","Prefix: {{label}}"
-"""
+    Fixtures.csv3
