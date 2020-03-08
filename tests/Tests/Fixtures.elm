@@ -17,7 +17,7 @@ msgstr "Value"
 #. Multiline
 #. comment
 msgid "Test.myString2"
-msgstr "Value"
+msgstr "Value2"
 
 #.
 #. i18n: placeholders: label
@@ -42,7 +42,7 @@ elements =
             , key = "myString2"
             , comment = "Multiline\ncomment"
             }
-        , value = "Value"
+        , value = "Value2"
         }
     , Localized.ElementFormat
         { meta =
@@ -59,35 +59,11 @@ elements =
     ]
 
 
-elements3 : List Element
-elements3 =
-    [ Localized.ElementStatic
-        { meta =
-            { moduleName = "Second"
-            , key = "myString"
-            , comment = "MyComment"
-            }
-        , value = "Value"
-        }
-    , Localized.ElementFormat
-        { meta =
-            { moduleName = "Test"
-            , key = "myFormat"
-            , comment = ""
-            }
-        , placeholders = [ "label" ]
-        , components =
-            [ Localized.FormatComponentStatic "Prefix: "
-            , Localized.FormatComponentPlaceholder "label"
-            ]
-        }
-    ]
-
-
-csv3 : String
-csv3 =
+csv : String
+csv =
     CSV.Template.headers ++ """
-"Second","myString","MyComment","","Value"
+"Test","myString","MyComment","","Value"
+"Test","myString2","Multiline\\ncomment","","Value2"
 "Test","myFormat","","label","Prefix: {{label}}"
 """
 

@@ -17,9 +17,9 @@ testExport =
 
 elements : List Localized.Element
 elements =
-    Fixtures.elements3
+    Fixtures.elements
 
 
 expectedCSV : String
 expectedCSV =
-    Fixtures.csv3
+    Fixtures.csv

@@ -25,7 +25,7 @@ generate elements =
     List.map line elements
         |> List.map
             (\columns ->
-                List.map (\column -> "\"" ++ column ++ "\"") columns
+                List.map (\column -> "\"" ++ escape column ++ "\"") columns
                     |> String.join ","
             )
         |> String.join "\n"
@@ -56,3 +56,9 @@ formatString components =
                         CSV.Template.placeholder placeholder
             )
         |> String.join ""
+
+
+escape : String -> String
+escape str =
+    str
+        |> String.replace "\n" "\\n"
