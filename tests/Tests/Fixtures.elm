@@ -14,6 +14,11 @@ msgstr ""
 msgid "Test.myString"
 msgstr "Value"
 
+#. Multiline
+#. comment
+msgid "Test.myString2"
+msgstr "Value"
+
 #.
 #. i18n: placeholders: label
 msgid "Test.myFormat"
@@ -31,57 +36,10 @@ elements =
             }
         , value = "Value"
         }
-    , Localized.ElementFormat
-        { meta =
-            { moduleName = "Test"
-            , key = "myFormat"
-            , comment = ""
-            }
-        , placeholders = [ "label" ]
-        , components =
-            [ Localized.FormatComponentStatic "Prefix: "
-            , Localized.FormatComponentPlaceholder "label"
-            ]
-        }
-    ]
-
-
-po2 : String
-po2 =
-    """msgid ""
-msgstr ""
-"Content-Type: text/plain; charset=UTF-8\\n"
-"X-Poedit-SourceCharset: UTF-8\\n"
-#. MyComment
-msgid "Test.myString"
-msgstr "Value"
-
-#. Multiline
-#. comment
-msgid "Second.myString"
-msgstr "Value"
-
-#.
-#. i18n: placeholders: label
-msgid "Test.myFormat"
-msgstr "Prefix: %(label)s"
-"""
-
-
-elements2 : List Element
-elements2 =
-    [ Localized.ElementStatic
-        { meta =
-            { moduleName = "Test"
-            , key = "myString"
-            , comment = "MyComment"
-            }
-        , value = "Value"
-        }
     , Localized.ElementStatic
         { meta =
-            { moduleName = "Second"
-            , key = "myString"
+            { moduleName = "Test"
+            , key = "myString2"
             , comment = "Multiline\ncomment"
             }
         , value = "Value"

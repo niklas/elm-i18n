@@ -22,7 +22,7 @@ testKeys =
         \() ->
             PO.keys inputPO
                 |> Expect.equal
-                    [ ( "Test", [ "myString", "myFormat" ] ) ]
+                    [ ( "Test", [ "myString", "myString2", "myFormat" ] ) ]
 
 
 testPlaceholders : Test

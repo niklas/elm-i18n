@@ -17,9 +17,9 @@ testExport =
 
 elements : List Localized.Element
 elements =
-    Fixtures.elements2
+    Fixtures.elements
 
 
 expectedPO : String
 expectedPO =
-    Fixtures.po2
+    Fixtures.po
