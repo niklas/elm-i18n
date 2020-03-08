@@ -11,7 +11,8 @@ import CSV.Export
 import CSV.Import
 import Flip exposing (flip)
 import Json.Decode
-import Localized
+import Localized exposing (..)
+import Localized.Element as Element
 import Localized.Filename as Filename
 import Localized.Parser as Localized
 import Localized.Switch
@@ -25,15 +26,10 @@ type alias Model =
     {}
 
 
-type Format
-    = CSV
-    | PO
-
-
 type Operation
-    = Export Format
-    | Import Format
-    | GenSwitch Format
+    = Export FileFormat
+    | Import FileFormat
+    | GenSwitch FileFormat
 
 
 type alias PathAndContent =
@@ -43,7 +39,7 @@ type alias PathAndContent =
 port exportResult : PathAndContent -> Cmd msg
 
 
-port importResult : List PathAndContent -> Cmd msg
+port importResult : PathAndContent -> Cmd msg
 
 
 operationFromString : String -> Maybe String -> Operation
@@ -61,7 +57,7 @@ operationFromString operation formatString =
            )
 
 
-formatFromString : Maybe String -> Format
+formatFromString : Maybe String -> FileFormat
 formatFromString maybeFormat =
     let
         formatString =
@@ -103,17 +99,9 @@ init flags =
             ( {}, operationGenerateSwitch flags.sources flags.languages )
 
 
-operationExport : List PathAndContent -> Format -> Cmd Never
+operationExport : List PathAndContent -> FileFormat -> Cmd Never
 operationExport sources format =
     let
-        exportFunction =
-            case format of
-                CSV ->
-                    CSV.Export.generate
-
-                PO ->
-                    PO.Export.generate
-
         filenameFunction =
             case format of
                 CSV ->
@@ -124,35 +112,27 @@ operationExport sources format =
     in
     sources
         |> List.map (Tuple.mapSecond Localized.parse)
-        |> List.map (Tuple.mapSecond <| List.map Localized.elementRemoveLang)
-        |> List.map (Tuple.mapSecond exportFunction)
+        |> List.map (Tuple.mapSecond <| List.map Element.removeLang)
+        |> List.map (Tuple.mapSecond <| Element.exportTo format)
         |> List.map (Tuple.mapFirst filenameFunction)
         |> List.map (Tuple.mapFirst Filename.lastSegmentFirst)
         |> List.map exportResult
         |> Cmd.batch
 
 
-operationImport : List PathAndContent -> Maybe (List Localized.LangCode) -> Format -> Cmd Never
-operationImport csvs mlangs format =
+operationImport : List PathAndContent -> Maybe (List Localized.LangCode) -> FileFormat -> Cmd Never
+operationImport sources mlangs format =
     let
         lang =
             mlangs |> Maybe.withDefault [] |> List.head |> Maybe.withDefault "Klingon"
-
-        importFunction =
-            case format of
-                CSV ->
-                    CSV.Import.generate
-
-                PO ->
-                    PO.Import.generate
     in
-    csvs
-        |> List.map (Tuple.mapSecond importFunction)
-        |> List.map (Tuple.mapSecond <| List.map <| addLanguageToModuleName lang)
-        |> List.map (Tuple.mapSecond Localized.Writer.generate)
-        |> List.map (Tuple.mapSecond <| List.map slashifyModuleName)
-        -- TODO generate po/csv filename here
-        |> List.map Tuple.second
+    sources
+        |> Debug.log "sources"
+        |> List.map (Tuple.mapFirst Filename.toModuleName)
+        |> List.map (Element.importFrom format)
+        -- TODO generate elm filename here
+        |> List.map Localized.Writer.generate
+        |> List.map (Tuple.mapFirst Filename.toElm)
         |> List.map importResult
         |> Cmd.batch
 
@@ -167,7 +147,8 @@ operationGenerateSwitch sources mlangs =
         |> List.map Tuple.second
         |> Localized.Switch.generate locales
         |> List.map slashifyModuleName
-        |> importResult
+        |> List.map importResult
+        |> Cmd.batch
 
 
 update : Never -> Model -> ( Model, Cmd Never )

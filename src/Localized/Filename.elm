@@ -1,6 +1,17 @@
-module Localized.Filename exposing (changeExt, lastSegmentFirst, toCSV, toPO)
+module Localized.Filename exposing
+    ( changeExt
+    , lastSegmentFirst
+    , toCSV
+    , toElm
+    , toElmWithLocale
+    , toModuleName
+    , toPO
+    )
 
+import Flip exposing (flip)
 import Regex exposing (Regex)
+import String.Extra
+import Utils.Regex exposing (findFirst, regex)
 
 
 toCSV : String -> String
@@ -11,6 +22,49 @@ toCSV =
 toPO : String -> String
 toPO =
     String.toLower >> changeExt "po"
+
+
+toModuleName : String -> String
+toModuleName org =
+    let
+        ex =
+            "^[^/]/(.*)\\." ++ extensionEx ++ "$"
+    in
+    case org |> findFirst ex of
+        Nothing ->
+            org
+
+        Just match ->
+            case match.submatches of
+                [ Just slashyPath ] ->
+                    slashyPath
+                        |> String.split "/"
+                        |> List.map String.Extra.classify
+                        |> String.join "."
+
+                _ ->
+                    org
+
+
+toElm : String -> String
+toElm moduleName =
+    (moduleName
+        |> String.split "."
+        |> List.append [ "Translation" ]
+        |> String.join "/"
+    )
+        ++ ".elm"
+
+
+toElmWithLocale : String -> String -> String
+toElmWithLocale locale moduleName =
+    (moduleName
+        |> String.split "."
+        |> List.append [ "Translation" ]
+        |> flip List.append [ locale ]
+        |> String.join "/"
+    )
+        ++ ".elm"
 
 
 changeExt : String -> String -> String
@@ -31,10 +85,8 @@ lastSegmentFirst org =
                 ++ ")\\.("
                 ++ extensionEx
                 ++ ")$"
-                |> Regex.fromString
-                |> Maybe.withDefault Regex.never
     in
-    case org |> Regex.findAtMost 1 ex |> List.head of
+    case org |> findFirst ex of
         Nothing ->
             org
 
@@ -49,7 +101,7 @@ lastSegmentFirst org =
 
 extRegex : Regex
 extRegex =
-    Regex.fromString "\\.\\w+$" |> Maybe.withDefault Regex.never
+    regex "\\.\\w+$"
 
 
 localeEx : String

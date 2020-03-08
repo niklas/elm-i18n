@@ -13,38 +13,43 @@ elements.
 -}
 
 import Dict exposing (Dict)
-import Localized
+import Localized exposing (..)
 import PO.Import.Internal exposing (..)
 
 
-{-| Generates localized elements for multiple modules from a PO
+{-| Generates localized elements for a module from a PO
 string. The msgids in the PO file are expected to include the module name and
-key. For example `msgid "Translation.Main.title"` will generate a
-`Localized.Element` with key `title` and module `Translation.Main`.
+key. For example `msgid "Main.title"` will generate a
+`Localized.Element` with key `title` and module `Main`.
 
 You will usually use this output to create elm code:
 
-    PO.Import.generate poString
+    PO.Import.generate ( "Main", poString )
         |> Localized.Writer.write
 
 -}
-generate : String -> List Localized.Module
-generate poString =
+generate : ( ModuleName, SourceCode ) -> Module
+generate ( moduleName, poString ) =
     let
-        keysInModules =
+        allKeysWithModuleName =
             keys poString
-    in
-    List.map
-        (\( moduleName, keysInModule ) ->
-            generateModule poString moduleName keysInModule
-                |> Tuple.pair moduleName
-        )
-        keysInModules
 
+        _ =
+            allKeysWithModuleName
+                |> List.map
+                    (\( keyModuleName, _ ) ->
+                        { key = keyModuleName, file = moduleName }
+                            |> (if keyModuleName /= moduleName then
+                                    Debug.log "WARNING: found a module name in a PO file where it does not belong"
 
-generateModule : String -> Localized.ModuleName -> List Localized.Key -> List Localized.Element
-generateModule poString moduleName allKeys =
-    let
+                                else
+                                    identity
+                               )
+                    )
+
+        allKeys =
+            allKeysWithModuleName |> List.map Tuple.second |> List.concat
+
         fullComments =
             poComments poString moduleName allKeys
 
@@ -62,3 +67,4 @@ generateModule poString moduleName allKeys =
             element moduleName key (valueForKey key) (fullCommentForKey key)
         )
         allKeys
+        |> Localized.buildModule moduleName

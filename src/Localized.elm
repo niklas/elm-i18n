@@ -1,4 +1,7 @@
-module Localized exposing (Element(..), Meta, Static, Format, FormatComponent(..), ModuleName, Key, Comment, Value, Placeholder, Module, ModuleImplementation, SourceCode, LangCode, isEmptyFormatComponent, elementMeta, languageModuleName, elementRemoveLang, namedModule)
+module Localized exposing
+    ( Element(..), Meta, Static, Format, FormatComponent(..), ModuleName, Key, Comment, Value, Placeholder, Module, ModuleImplementation, SourceCode, LangCode, isEmptyFormatComponent, elementMeta, languageModuleName, namedModule
+    , FileFormat(..), buildModule
+    )
 
 {-| This module provides data structures describing localized string functions
 and constants.
@@ -92,6 +95,12 @@ type alias Format =
     }
 
 
+{-| The representation of a file and its contents
+-}
+type alias PathAndContent =
+    ( FilePath, SourceCode )
+
+
 {-| The representation of an Elm module containing a list of Elements.
 -}
 type alias Module =
@@ -115,6 +124,17 @@ type FormatComponent
 -}
 type alias LangCode =
     String
+
+
+{-| A relative path to a file that has been read or will be written
+-}
+type alias FilePath =
+    String
+
+
+type FileFormat
+    = CSV
+    | PO
 
 
 {-| Returns true if the component is empty.
@@ -155,33 +175,6 @@ namedModule name =
     ( name, [] )
 
 
-{-| Removes a locale "En" from a module name like "Area.Foo.En"
--}
-elementRemoveLang : Element -> Element
-elementRemoveLang =
-    elementUpdateMeta
-        (\meta ->
-            let
-                newName =
-                    meta.moduleName
-                        |> String.split "."
-                        |> listDropRight 1
-                        |> String.join "."
-            in
-            { meta | moduleName = newName }
-        )
-
-
-listDropRight : Int -> List a -> List a
-listDropRight n =
-    List.reverse << List.drop 1 << List.reverse
-
-
-elementUpdateMeta : (Meta -> Meta) -> Element -> Element
-elementUpdateMeta fun element =
-    case element of
-        ElementStatic e ->
-            ElementStatic { e | meta = fun e.meta }
-
-        ElementFormat e ->
-            ElementFormat { e | meta = fun e.meta }
+buildModule : ModuleName -> List Element -> Module
+buildModule name elements =
+    ( name, elements )

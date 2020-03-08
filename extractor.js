@@ -62,26 +62,20 @@ if (argv.export) {
         process.exit(403);
     }
 
-    let pathToImportFile = path.join(currentDir, argv.import);
-    if (!fs.existsSync(pathToImportFile)) {
-        console.error("Could not find " + argv.format + " file at", pathToImportFile);
-        process.exit(403);
-    }
+    let pathToImport = path.join(currentDir, argv.import);
 
-    let data = fs.readFileSync(pathToImportFile);
-    let csvContent = data.toString();
+    let fileContents = readFiles(pathToImport, "{" + argv.language + "}/**/*." + argv.format);
 
     let worker = Elm.Elm.Main.init({
-        "languages": argv.language.split(","),
-        "sources": [csvContent],
-        "operation": "import",
-        "format": argv.format,
+				"flags": {
+						"languages": argv.language.split(","),
+						"sources": fileContents,
+						"operation": "import",
+						"format": argv.format
+				}
     });
 
-    let importDir = path.join(currentDir, argv.importOutput, argv.root);
-    worker.ports.importResult.subscribe(function(resultString) {
-        handleImport(resultString, importDir);
-    });
+    worker.ports.importResult.subscribe(handleImport);
 } else {
     let fullPath = path.join(currentDir, argv.root);
     console.log("Parsing from", fullPath);
@@ -116,8 +110,7 @@ function handleExport([filePath, resultString]) {
     }
 
     let targetPath = path.join(currentDir, argv.exportOutput, filePath);
-		mkdirp.sync(path.dirname(targetPath));
-    fs.writeFileSync(targetPath, resultString);
+		writeFile(targetPath, resultString);
     console.log("Finished writing file to:", targetPath);
 }
 
@@ -127,27 +120,25 @@ function handleExport([filePath, resultString]) {
  *
  * @param  {[[String]]} results A list of (module name, file content) tuples.
  */
-function handleImport(results, importDir) {
-    fs.ensureDirSync(importDir);
-    console.log("Writing elm-files files to:", importDir);
-    results.forEach(function(result) {
-        let moduleName = result[0];
-        if (moduleName.indexOf(argv.root) === 0) {
-            moduleName = moduleName.substr(argv.root.length + 1);
-        }
-        let filePath = path.join(importDir, moduleName + ".elm");
-        // we also generate the top-level Translation.elm
-        filePath = filePath.replace(/\/(\.elm)$/, "$1");
-        fs.ensureDirSync(path.dirname(filePath));
-        fs.writeFileSync(filePath, result[1]);
-        console.log("└── Finished writing:", filePath);
-    });
-    console.log("Completed");
+function handleImport([filePath, resultString]) {
+    if (resultString === "") {
+        process.exit(500);
+    }
+
+    let targetPath = path.join(currentDir, argv.importOutput, filePath);
+		writeFile(targetPath, resultString);
+    console.log("Finished writing file to:", targetPath);
 }
 
 
 function readFiles(basePath, pattern) {
-		return glob.sync(basePath + pattern).map(function(file) {
+		let pat = path.join(basePath, pattern);
+		return glob.sync(pat).map(function(file) {
 				return [path.relative(basePath, file), fs.readFileSync(file).toString()];
 		});
+}
+
+function writeFile(filePath, content) {
+		mkdirp.sync(path.dirname(filePath));
+    fs.writeFileSync(filePath, content);
 }

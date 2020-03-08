@@ -9,6 +9,7 @@ module Localized.Switch exposing (generate)
 
 import Dict exposing (Dict)
 import Localized
+import Localized.Element as Element
 import Localized.Parser as Parser
 import Localized.Writer.Element exposing (tab)
 import Localized.Writer.Module
@@ -168,4 +169,4 @@ mainModule languages =
 
 removeLocale : List Localized.LangCode -> Localized.Element -> Localized.Element
 removeLocale langs element =
-    Localized.elementRemoveLang element
+    Element.removeLang element

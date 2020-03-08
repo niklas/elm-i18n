@@ -14,17 +14,17 @@ testGenerate : Test
 testGenerate =
     test "testGenerate" <|
         \() ->
-            CSV.generate inputCSV
-                |> Expect.equal [ ( "Test", elements ) ]
+            CSV.generate ( "Test", inputCSV )
+                |> Expect.equal ( "Test", elements )
 
 
 testImport : Test
 testImport =
     test "testImport" <|
         \() ->
-            CSV.generate inputCSV
+            CSV.generate ( "Test", inputCSV )
                 |> Writer.generate
-                |> Expect.equal [ ( "Test", expectedSource ) ]
+                |> Expect.equal ( "Test", expectedSource )
 
 
 testFullCircle : Test
@@ -33,9 +33,9 @@ testFullCircle =
         \() ->
             Localized.parse expectedSource
                 |> Export.generate
-                |> CSV.generate
+                |> (CSV.generate << Tuple.pair "Test")
                 |> Writer.generate
-                |> Expect.equal [ ( "Test", expectedSource ) ]
+                |> Expect.equal ( "Test", expectedSource )
 
 
 inputCSV : String

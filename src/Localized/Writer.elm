@@ -13,15 +13,15 @@ import Localized.Writer.Element
 import Localized.Writer.Module
 
 
-{-| Generate elm-source code for a list of modules and their associated
+{-| Generate elm-source code for a module and its associated
 localized elements.
 -}
-generate : List Localized.Module -> List ( Localized.ModuleName, Localized.SourceCode )
+generate : Localized.Module -> Localized.ModuleImplementation
 generate =
-    List.map moduleImplementation
+    moduleImplementation
 
 
-moduleImplementation : Localized.Module -> ( Localized.ModuleName, Localized.SourceCode )
+moduleImplementation : Localized.Module -> Localized.ModuleImplementation
 moduleImplementation mod =
     let
         ( moduleName, _ ) =

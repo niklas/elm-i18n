@@ -15,7 +15,7 @@ elements.
 
 import Csv
 import Dict
-import Localized
+import Localized exposing (..)
 import Set
 
 
@@ -29,22 +29,34 @@ You will usually use this output to create elm code:
         |> Localized.Writer.write
 
 -}
-generate : String -> List Localized.Module
-generate csv =
+generate : ( ModuleName, SourceCode ) -> Module
+generate ( moduleName, csv ) =
     case Csv.parse csv of
         Result.Ok lines ->
-            generateForCsv lines
+            generateForCsv moduleName lines
 
         Result.Err err ->
             Debug.log "Could not parse CSV" err
-                |> always []
+                |> always (Localized.buildModule moduleName [])
 
 
-generateForCsv : Csv.Csv -> List Localized.Module
-generateForCsv lines =
+generateForCsv : ModuleName -> Csv.Csv -> Module
+generateForCsv moduleName lines =
     let
         modules =
             allModuleNames lines.records
+                |> List.map
+                    (\mn ->
+                        if mn /= moduleName then
+                            let
+                                _ =
+                                    Debug.log "WARNING: found a module name in a CSV file where it does not belong" { key = mn, file = moduleName }
+                            in
+                            mn
+
+                        else
+                            mn
+                    )
                 |> Set.fromList
                 |> Set.toList
 
@@ -59,19 +71,13 @@ generateForCsv lines =
                         )
                     )
                 |> Dict.fromList
+
+        linesForThisModule =
+            Dict.get moduleName linesForModules
+                |> Maybe.withDefault []
     in
-    -- Generate the source code for each module based on the lines
-    -- grouped in the expression above.
-    List.map
-        (\name ->
-            let
-                linesForThisModule =
-                    Dict.get name linesForModules
-                        |> Maybe.withDefault []
-            in
-            ( name, generateForModule linesForThisModule )
-        )
-        modules
+    -- Generate the source code for only out module, ignore the keys which don't belong here (warned above)
+    Localized.buildModule moduleName (generateForModule linesForThisModule)
 
 
 generateForModule : List (List String) -> List Localized.Element
@@ -79,7 +85,7 @@ generateForModule lines =
     List.filterMap fromLine lines
 
 
-allModuleNames : List (List String) -> List String
+allModuleNames : List (List String) -> List ModuleName
 allModuleNames lines =
     List.filterMap moduleNameForLine lines
 
