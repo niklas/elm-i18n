@@ -28,7 +28,7 @@ toModuleName : String -> String
 toModuleName org =
     let
         ex =
-            "^[^/]/(.*)\\." ++ extensionEx ++ "$"
+            "^[^/]+/(.+)\\." ++ extensionEx ++ "$"
     in
     case org |> findFirst ex of
         Nothing ->

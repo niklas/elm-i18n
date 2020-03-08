@@ -19,4 +19,9 @@ suite =
                 \_ ->
                     Expect.equal "Translation/Foo/Bar/Baz/EnUs.elm" (Subject.toElmWithLocale "EnUs" "Foo.Bar.Baz")
             ]
+        , describe ".toModuleName"
+            [ test "converts a csv/po relative file name to a module name" <|
+                \_ ->
+                    Expect.equal "Auth.Form" (Subject.toModuleName "de/auth/form.po")
+            ]
         ]
