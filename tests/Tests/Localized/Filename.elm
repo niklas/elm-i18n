@@ -12,16 +12,36 @@ suite =
         [ describe ".toElm"
             [ test "converts a module name to a relative elm file path" <|
                 \_ ->
-                    Expect.equal "Translation/Foo/Bar/Baz.elm" (Subject.toElm "Foo.Bar.Baz")
+                    Expect.equal elmName (Subject.toElm moduleName)
             ]
         , describe ".toElmWithLocale"
             [ test "converts a module name to a relative elm file path" <|
                 \_ ->
-                    Expect.equal "Translation/Foo/Bar/Baz/EnUs.elm" (Subject.toElmWithLocale "EnUs" "Foo.Bar.Baz")
+                    Expect.equal elmNameWithLocale (Subject.toElmWithLocale locale moduleName)
             ]
         , describe ".toModuleName"
             [ test "converts a csv/po relative file name to a module name" <|
                 \_ ->
-                    Expect.equal "Auth.Form" (Subject.toModuleName "de/auth/form.po")
+                    Expect.equal moduleName (Subject.toModuleName poName)
             ]
         ]
+
+
+moduleName =
+    "Foo.BarBam.Baz"
+
+
+elmName =
+    "Translation/Foo/BarBam/Baz.elm"
+
+
+elmNameWithLocale =
+    "Translation/Foo/BarBam/Baz/EnUs.elm"
+
+
+locale =
+    "EnUs"
+
+
+poName =
+    "de/foo/bar_bam/baz.po"
