@@ -126,7 +126,7 @@ function handleImport([filePath, resultString]) {
     }
 
     let targetPath = path.join(currentDir, argv.importOutput, filePath);
-		writeFile(targetPath, resultString);
+		//writeFile(targetPath, resultString);
     console.log("Finished writing file to:", targetPath);
 }
 
