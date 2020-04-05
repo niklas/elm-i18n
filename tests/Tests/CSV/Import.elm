@@ -16,7 +16,7 @@ testGenerate =
     test "testGenerate" <|
         \() ->
             CSV.generate ( "Test", inputCSV )
-                |> Expect.equal ( "Test", elements )
+                |> Expect.equal (Localized.buildModule "Test" elements)
 
 
 testImport : Test

@@ -13,7 +13,7 @@ testImport =
     test "testImport" <|
         \() ->
             PO.generate ( "Test", inputPO )
-                |> Expect.equal ( "Test", elements )
+                |> Expect.equal { name = "Test", elements = elements }
 
 
 testKeys : Test

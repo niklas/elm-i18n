@@ -1,6 +1,6 @@
 module Localized exposing
     ( Element(..), Meta, Static, Format, FormatComponent(..), ModuleName, Key, Comment, Value, Placeholder, Module, ModuleImplementation, SourceCode, LangCode, isEmptyFormatComponent, elementMeta, languageModuleName, namedModule
-    , FileFormat(..), buildModule
+    , FileFormat(..), buildModule, mapModuleName
     )
 
 {-| This module provides data structures describing localized string functions
@@ -104,7 +104,9 @@ type alias PathAndContent =
 {-| The representation of an Elm module containing a list of Elements.
 -}
 type alias Module =
-    ( ModuleName, List Element )
+    { name : ModuleName
+    , elements : List Element
+    }
 
 
 {-| The representation of an Elm module with its complete source
@@ -172,9 +174,14 @@ languageModuleName name lang =
 -}
 namedModule : ModuleName -> Module
 namedModule name =
-    ( name, [] )
+    buildModule name []
 
 
 buildModule : ModuleName -> List Element -> Module
 buildModule name elements =
-    ( name, elements )
+    Module name elements
+
+
+mapModuleName : (ModuleName -> ModuleName) -> Module -> Module
+mapModuleName fun ({ name } as mod) =
+    { mod | name = fun name }

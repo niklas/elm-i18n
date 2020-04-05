@@ -22,12 +22,8 @@ generate =
 
 
 moduleImplementation : Localized.Module -> Localized.ModuleImplementation
-moduleImplementation mod =
-    let
-        ( moduleName, _ ) =
-            mod
-    in
-    ( moduleName
+moduleImplementation ({ name } as mod) =
+    ( name
     , Localized.Writer.Module.implementation element mod
     )
 

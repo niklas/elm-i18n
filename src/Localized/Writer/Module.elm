@@ -23,15 +23,15 @@ implementation functionImplementation mod =
 
 
 elements : (Localized.Element -> Localized.SourceCode) -> Localized.Module -> Localized.SourceCode
-elements functionImplementation ( _, eles ) =
-    List.map functionImplementation eles
+elements functionImplementation mod =
+    List.map functionImplementation mod.elements
         |> String.join "\n\n\n"
         |> String.trim
         |> flip String.append "\n"
 
 
 head : Localized.Module -> Localized.SourceCode
-head ( name, _ ) =
+head { name } =
     "module "
         ++ "Translation."
         ++ name
@@ -39,12 +39,12 @@ head ( name, _ ) =
 
 
 importModule : Localized.Module -> Localized.SourceCode
-importModule ( name, _ ) =
+importModule { name } =
     "import " ++ name ++ "\n"
 
 
 importModuleExposingAll : Localized.Module -> Localized.SourceCode
-importModuleExposingAll ( name, _ ) =
+importModuleExposingAll { name } =
     "import "
         ++ name
         ++ " exposing (..)\n"

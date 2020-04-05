@@ -25,6 +25,7 @@ generate languages sources =
                 |> unique
                 |> indexBy (Localized.elementMeta .moduleName)
                 |> Dict.toList
+                |> List.map (\( n, e ) -> Localized.buildModule n e)
                 |> List.map (switchSource languages)
            )
 
@@ -93,17 +94,13 @@ indexBy keymaker elements =
 
 
 switchSource : List Localized.LangCode -> Localized.Module -> ( Localized.ModuleName, Localized.SourceCode )
-switchSource languages mod =
-    let
-        ( moduleName, _ ) =
-            mod
-    in
-    ( moduleName
+switchSource languages ({ name } as mod) =
+    ( name
     , Localized.Writer.Module.head mod
-        ++ Localized.Writer.Module.importModuleExposingAll ( "Translation", [] )
+        ++ Localized.Writer.Module.importModuleExposingAll (Localized.namedModule "Translation")
         ++ (String.join "" <|
                 List.map
-                    (Localized.Writer.Module.importModule << Localized.namedModule << Localized.languageModuleName moduleName)
+                    (Localized.Writer.Module.importModule << Localized.namedModule << Localized.languageModuleName name)
                     languages
            )
         ++ "\n\n"
@@ -153,7 +150,7 @@ mainModule languages =
             "Translation"
 
         mod =
-            ( name, [] )
+            Localized.namedModule name
     in
     ( name
     , Localized.Writer.Module.head mod

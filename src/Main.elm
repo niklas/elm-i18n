@@ -163,4 +163,4 @@ slashifyModuleName =
 
 addLanguageToModuleName : Localized.LangCode -> Localized.Module -> Localized.Module
 addLanguageToModuleName lang =
-    Tuple.mapFirst (flip Localized.languageModuleName lang)
+    Localized.mapModuleName (flip Localized.languageModuleName lang)
