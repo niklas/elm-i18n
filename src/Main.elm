@@ -101,24 +101,9 @@ init flags =
 
 operationExport : List PathAndContent -> FileFormat -> Cmd Never
 operationExport sources format =
-    let
-        filenameFunction =
-            case format of
-                CSV ->
-                    Filename.toCSV
-
-                PO ->
-                    Filename.toPO
-    in
     sources
-        |> List.map (Tuple.mapSecond Localized.parse)
-        |> List.map
-            (\( elmFileName, elements ) ->
-                ( elmFileName |> filenameFunction |> Filename.lastSegmentFirst
-                , Element.exportTo format parsed
-                )
-            )
-        |> List.map (Element.exportTo format)
+        |> List.map parseElm
+        |> List.map (write format)
         |> List.map exportResult
         |> Cmd.batch
 
@@ -128,14 +113,12 @@ operationImport sources mlangs format =
     let
         lang =
             mlangs |> Maybe.withDefault [] |> List.head |> Maybe.withDefault "Klingon"
+
+        -- TODO find undefined translations, default to other langs
     in
     sources
-        |> Debug.log "sources"
-        |> List.map (Tuple.mapFirst Filename.toModuleName)
-        |> List.map (Element.importFrom format)
-        -- TODO generate elm filename here
-        |> List.map Localized.Writer.generate
-        |> List.map (Tuple.mapFirst Filename.toElm)
+        |> List.map (parse format)
+        |> List.map writeElm
         |> List.map importResult
         |> Cmd.batch
 
@@ -167,3 +150,68 @@ slashifyModuleName =
 addLanguageToModuleName : Localized.LangCode -> Localized.Module -> Localized.Module
 addLanguageToModuleName lang =
     Localized.mapModuleName (flip Localized.languageModuleName lang)
+
+
+parse : FileFormat -> PathAndContent -> Module
+parse format ( fileName, content ) =
+    let
+        ( moduleName, lang ) =
+            case format of
+                CSV ->
+                    CSV.parseFileName fileName
+
+                PO ->
+                    PO.parseFileName fileName
+
+        parsed =
+            case format of
+                CSV ->
+                    CSV.parse content
+
+                PO ->
+                    PO.parse content
+    in
+    Module moduleName lang <| parsed content
+
+
+parseElm : PathAndContent -> Module
+parseElm ( fileName, content ) =
+    let
+        ( moduleName, lang ) =
+            Filename.toModuleNameAndLang fileName
+    in
+    Module moduleName lang <| Elm.parse
+
+
+write : FileFormat -> Module -> PathAndContent
+write format modul =
+    let
+        fileName =
+            case format of
+                CSV ->
+                    Filename.toCSV modul
+
+                PO ->
+                    Filename.toPO modul
+
+        content =
+            case format of
+                CSV ->
+                    Module.toCSV modul
+
+                PO ->
+                    Module.toPO modul
+    in
+    ( fileName, content )
+
+
+writeElm : Module -> PathAndContent
+writeElm modul =
+    let
+        fileName =
+            Filename.toElm modul
+
+        content =
+            Module.toElm modul
+    in
+    ( fileName, content )
