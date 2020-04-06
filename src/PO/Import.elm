@@ -64,7 +64,7 @@ generate ( moduleName, poString ) =
     in
     List.map
         (\key ->
-            element moduleName key (valueForKey key) (fullCommentForKey key)
+            element key (valueForKey key) (fullCommentForKey key)
         )
         allKeys
         |> Localized.buildModule moduleName

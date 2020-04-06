@@ -15,19 +15,27 @@ import Localized.Writer.Element exposing (tab)
 import Localized.Writer.Module
 
 
+
+-- TODO we should pass a list of Modules and mangle them here
+
+
 generate : List Localized.LangCode -> List Localized.SourceCode -> List ( Localized.ModuleName, Localized.SourceCode )
 generate languages sources =
-    mainModule languages
-        :: (sources
-                |> List.map Parser.parse
-                |> flatten2D
-                |> List.map (removeLocale languages)
-                |> unique
-                |> indexBy (Localized.elementMeta .moduleName)
-                |> Dict.toList
-                |> List.map (\( n, e ) -> Localized.buildModule n e)
-                |> List.map (switchSource languages)
-           )
+    []
+
+
+
+-- mainModule languages
+--     :: (sources
+--             |> List.map Parser.parse
+--             |> flatten2D
+--             -- |> List.map (removeLocale languages)
+--             |> unique
+--             |> indexBy (Localized.elementMeta .moduleName)
+--             |> Dict.toList
+--             |> List.map (\( n, e ) -> Localized.buildModule n e)
+--             |> List.map (switchSource languages)
+--        )
 
 
 unique : List Localized.Element -> List Localized.Element
@@ -56,22 +64,7 @@ flatten2D list =
 
 member : Localized.Element -> List Localized.Element -> Bool
 member e list =
-    let
-        sameElement e1 e2 =
-            case ( e1, e2 ) of
-                ( Localized.ElementFormat _, Localized.ElementStatic _ ) ->
-                    False
-
-                ( Localized.ElementStatic _, Localized.ElementFormat _ ) ->
-                    False
-
-                ( Localized.ElementStatic m1, Localized.ElementStatic m2 ) ->
-                    m1.meta.moduleName == m2.meta.moduleName && m1.meta.key == m2.meta.key
-
-                ( Localized.ElementFormat m1, Localized.ElementFormat m2 ) ->
-                    m1.meta.moduleName == m2.meta.moduleName && m1.meta.key == m2.meta.key
-    in
-    List.any (sameElement e) list
+    List.any (Element.isEqual e) list
 
 
 indexBy : (Localized.Element -> comparable) -> List Localized.Element -> Dict comparable (List Localized.Element)
@@ -114,8 +107,10 @@ elementSource languages element =
         name =
             Localized.elementMeta .key element
 
+        -- TODO but here, we have to pass the module(name)
+        -- Localized.elementMeta .moduleName element
         moduleName =
-            Localized.elementMeta .moduleName element
+            "TODO"
 
         placeholders =
             Localized.Writer.Element.placeholders element
@@ -158,12 +153,3 @@ mainModule languages =
         ++ String.join " | " languages
         ++ "\n"
     )
-
-
-
--- TODO we do not have to pass langs here, they are always the last element of the elm module name
-
-
-removeLocale : List Localized.LangCode -> Localized.Element -> Localized.Element
-removeLocale langs element =
-    Element.removeLang element

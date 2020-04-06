@@ -60,8 +60,7 @@ within a module. The comment should help translators and others understand how
 and where the localized element is used.
 -}
 type alias Meta =
-    { moduleName : ModuleName
-    , key : Key
+    { key : Key
     , comment : Comment
     }
 

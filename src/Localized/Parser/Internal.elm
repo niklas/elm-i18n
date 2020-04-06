@@ -73,8 +73,8 @@ stringDeclarations source =
             )
 
 
-findStaticElementForKey : Localized.ModuleName -> Localized.SourceCode -> Localized.Key -> Maybe Localized.Element
-findStaticElementForKey moduleName source key =
+findStaticElementForKey : Localized.SourceCode -> Localized.Key -> Maybe Localized.Element
+findStaticElementForKey source key =
     let
         maybeValue =
             Regex.findAtMost 1 (regexSimpleStringValue key) source
@@ -87,7 +87,7 @@ findStaticElementForKey moduleName source key =
     in
     case maybeValue of
         Just value ->
-            Localized.Static (Localized.Meta moduleName key (findComment source key)) value
+            Localized.Static (Localized.Meta key (findComment source key)) value
                 |> Localized.ElementStatic
                 |> Just
 
@@ -95,8 +95,8 @@ findStaticElementForKey moduleName source key =
             Nothing
 
 
-findFormatElementForKey : Localized.ModuleName -> Localized.SourceCode -> Localized.Key -> Maybe Localized.Element
-findFormatElementForKey moduleName source key =
+findFormatElementForKey : Localized.SourceCode -> Localized.Key -> Maybe Localized.Element
+findFormatElementForKey source key =
     let
         ex =
             regexFormats key
@@ -129,7 +129,7 @@ findFormatElementForKey moduleName source key =
             Nothing
 
         placeholderList ->
-            Localized.Format (Localized.Meta moduleName key (findComment source key)) placeholderList content
+            Localized.Format (Localized.Meta key (findComment source key)) placeholderList content
                 |> Localized.ElementFormat
                 |> Just
 

@@ -16,8 +16,8 @@ import String.Extra
 import Utils.Regex
 
 
-element : Localized.ModuleName -> Localized.Key -> Localized.Value -> Localized.Comment -> Localized.Element
-element moduleName key value fullComment =
+element : Localized.Key -> Localized.Value -> Localized.Comment -> Localized.Element
+element key value fullComment =
     let
         comment =
             commentFromPoComment fullComment
@@ -44,8 +44,7 @@ element moduleName key value fullComment =
             String.Extra.unquote value
 
         meta =
-            { moduleName = moduleName
-            , key = key
+            { key = key
             , comment = comment
             }
     in

@@ -22,21 +22,21 @@ Elm source code into a list of localized elements:
         |> PO.Export.generate
 
 -}
-generate : List Localized.Element -> String
-generate elements =
-    List.map line elements
+generate : Localized.Module -> String
+generate { elements, name } =
+    List.map (line name) elements
         |> String.join "\n\n"
         |> flip String.append "\n"
         |> String.append forceUTF8
 
 
-line : Localized.Element -> String
-line element =
+line : Localized.ModuleName -> Localized.Element -> String
+line moduleName element =
     case element of
         Localized.ElementStatic static ->
             commentLine static.meta.comment
                 ++ "\n"
-                ++ identifier static.meta.moduleName static.meta.key
+                ++ identifier moduleName static.meta.key
                 ++ "\n"
                 ++ staticElement static.value
 
@@ -45,7 +45,7 @@ line element =
                 ++ "\n"
                 ++ commentLine (PO.Template.placeholderCommentPrefix ++ String.join " " format.placeholders)
                 ++ "\n"
-                ++ identifier format.meta.moduleName format.meta.key
+                ++ identifier moduleName format.meta.key
                 ++ "\n"
                 ++ ("msgstr " ++ formatElement format.components)
 

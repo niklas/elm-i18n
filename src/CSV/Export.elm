@@ -20,9 +20,9 @@ Elm source code into a list of localized elements:
         |> CSV.Export.generate
 
 -}
-generate : List Localized.Element -> String
-generate elements =
-    List.map line elements
+generate : Localized.Module -> String
+generate { elements, name } =
+    List.map (line name) elements
         |> List.map
             (\columns ->
                 List.map (\column -> "\"" ++ escape column ++ "\"") columns
@@ -33,14 +33,14 @@ generate elements =
         |> flip String.append "\n"
 
 
-line : Localized.Element -> List String
-line element =
+line : Localized.ModuleName -> Localized.Element -> List String
+line moduleName element =
     case element of
         Localized.ElementStatic static ->
-            [ static.meta.moduleName, static.meta.key, static.meta.comment, "", static.value ]
+            [ moduleName, static.meta.key, static.meta.comment, "", static.value ]
 
         Localized.ElementFormat format ->
-            [ format.meta.moduleName, format.meta.key, format.meta.comment, String.join " " format.placeholders, formatString format.components ]
+            [ moduleName, format.meta.key, format.meta.comment, String.join " " format.placeholders, formatString format.components ]
 
 
 formatString : List Localized.FormatComponent -> String

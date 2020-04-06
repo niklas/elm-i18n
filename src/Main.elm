@@ -112,10 +112,13 @@ operationExport sources format =
     in
     sources
         |> List.map (Tuple.mapSecond Localized.parse)
-        |> List.map (Tuple.mapSecond <| List.map Element.removeLang)
-        |> List.map (Tuple.mapSecond <| Element.exportTo format)
-        |> List.map (Tuple.mapFirst filenameFunction)
-        |> List.map (Tuple.mapFirst Filename.lastSegmentFirst)
+        |> List.map
+            (\( elmFileName, elements ) ->
+                ( elmFileName |> filenameFunction |> Filename.lastSegmentFirst
+                , Element.exportTo format parsed
+                )
+            )
+        |> List.map (Element.exportTo format)
         |> List.map exportResult
         |> Cmd.batch
 

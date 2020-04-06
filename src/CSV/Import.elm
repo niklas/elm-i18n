@@ -108,15 +108,15 @@ linesForModule moduleName lines =
 fromLine : List String -> Maybe Localized.Element
 fromLine columns =
     case columns of
-        modulename :: key :: comment :: placeholders :: value :: xs ->
-            Just (code modulename key comment placeholders value)
+        key :: comment :: placeholders :: value :: xs ->
+            Just (code key comment placeholders value)
 
         _ ->
             Nothing
 
 
-code : Localized.ModuleName -> Localized.Key -> Localized.Comment -> String -> Localized.Value -> Localized.Element
-code modulename key comment placeholderString value =
+code : Localized.Key -> Localized.Comment -> String -> Localized.Value -> Localized.Element
+code key comment placeholderString value =
     let
         placeholders =
             String.split " " placeholderString
@@ -127,14 +127,14 @@ code modulename key comment placeholderString value =
             List.length placeholders
     in
     if numPlaceholders == 0 then
-        staticElement modulename key comment value
+        staticElement key comment value
 
     else
-        formatElement modulename key comment placeholders value
+        formatElement key comment placeholders value
 
 
-formatElement : Localized.ModuleName -> Localized.Key -> Localized.Comment -> List Localized.Placeholder -> Localized.Value -> Localized.Element
-formatElement modulename key comment placeholders value =
+formatElement : Localized.Key -> Localized.Comment -> List Localized.Placeholder -> Localized.Value -> Localized.Element
+formatElement key comment placeholders value =
     let
         components =
             -- "Hello {{p}} Goodbye {{q}}" -> ["Hello ", "p}} Goodbye ", "q }}"]
@@ -163,8 +163,7 @@ formatElement modulename key comment placeholders value =
     in
     Localized.ElementFormat
         { meta =
-            { moduleName = modulename
-            , key = key
+            { key = key
             , comment = comment
             }
         , placeholders = placeholders
@@ -172,12 +171,11 @@ formatElement modulename key comment placeholders value =
         }
 
 
-staticElement : Localized.ModuleName -> Localized.Key -> Localized.Comment -> Localized.Value -> Localized.Element
-staticElement modulename key comment value =
+staticElement : Localized.Key -> Localized.Comment -> Localized.Value -> Localized.Element
+staticElement key comment value =
     Localized.ElementStatic
         { meta =
-            { moduleName = modulename
-            , key = key
+            { key = key
             , comment = comment
             }
         , value = value

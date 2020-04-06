@@ -1,7 +1,7 @@
 module Localized.Element exposing
     ( exportTo
     , importFrom
-    , removeLang
+    , isEqual
     )
 
 import CSV.Export
@@ -21,7 +21,7 @@ importFrom format =
             PO.Import.generate
 
 
-exportTo : FileFormat -> List Element -> SourceCode
+exportTo : FileFormat -> Module -> SourceCode
 exportTo format =
     case format of
         CSV ->
@@ -41,23 +41,22 @@ updateMeta fun element =
             ElementFormat { e | meta = fun e.meta }
 
 
-{-| Removes a locale "En" from a module name like "Area.Foo.En"
--}
-removeLang : Element -> Element
-removeLang =
-    updateMeta
-        (\meta ->
-            let
-                newName =
-                    meta.moduleName
-                        |> String.split "."
-                        |> listDropRight 1
-                        |> String.join "."
-            in
-            { meta | moduleName = newName }
-        )
-
-
 listDropRight : Int -> List a -> List a
 listDropRight n =
     List.reverse << List.drop 1 << List.reverse
+
+
+isEqual : Element -> Element -> Bool
+isEqual e1 e2 =
+    case ( e1, e2 ) of
+        ( Localized.ElementFormat _, Localized.ElementStatic _ ) ->
+            False
+
+        ( Localized.ElementStatic _, Localized.ElementFormat _ ) ->
+            False
+
+        ( Localized.ElementStatic m1, Localized.ElementStatic m2 ) ->
+            m1.meta.key == m2.meta.key
+
+        ( Localized.ElementFormat m1, Localized.ElementFormat m2 ) ->
+            m1.meta.key == m2.meta.key
