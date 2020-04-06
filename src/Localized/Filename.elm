@@ -1,6 +1,7 @@
 module Localized.Filename exposing
     ( changeExt
     , lastSegmentFirst
+    , normalizeLanguageCode
     , toCSV
     , toElm
     , toElmWithLocale
@@ -71,7 +72,7 @@ toModuleNameAndLangPrefix org =
                         |> String.split "/"
                         |> List.map String.Extra.classify
                         |> String.join "."
-                    , langCode |> String.toLower
+                    , normalizeLanguageCode langCode
                     )
 
                 _ ->
@@ -95,7 +96,7 @@ toModuleNameAndLangPostfix org =
                         |> String.split "/"
                         |> List.map String.Extra.classify
                         |> String.join "."
-                    , langCode |> String.toLower
+                    , normalizeLanguageCode langCode
                     )
 
                 _ ->
@@ -168,3 +169,7 @@ localeEx =
 extensionEx : String
 extensionEx =
     "\\w+"
+
+
+normalizeLanguageCode =
+    String.Extra.classify

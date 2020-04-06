@@ -33,11 +33,6 @@ type alias Model =
 type Operation
     = Export FileFormat
     | Import FileFormat
-    | GenSwitch FileFormat
-
-
-type alias PathAndContent =
-    ( String, String )
 
 
 port exportResult : PathAndContent -> Cmd msg
@@ -57,7 +52,7 @@ operationFromString operation formatString =
                     Export
 
                 _ ->
-                    GenSwitch
+                    Import
            )
 
 
@@ -99,9 +94,6 @@ init flags =
         Import format ->
             ( {}, operationImport flags.sources flags.languages format )
 
-        GenSwitch _ ->
-            ( {}, operationGenerateSwitch flags.sources flags.languages )
-
 
 operationExport : List PathAndContent -> FileFormat -> Cmd Never
 operationExport sources format =
@@ -115,28 +107,21 @@ operationExport sources format =
 operationImport : List PathAndContent -> Maybe (List Localized.LangCode) -> FileFormat -> Cmd Never
 operationImport sources mlangs format =
     let
-        lang =
-            mlangs |> Maybe.withDefault [] |> List.head |> Maybe.withDefault "Klingon"
+        locales =
+            Maybe.withDefault [ "Klingon" ] mlangs |> List.map Filename.normalizeLanguageCode
+
+        modules =
+            sources
+                |> List.map (parse format)
 
         -- TODO find undefined translations, default to other langs
+        switches =
+            modules
+                |> Localized.Switch.generate locales
+                |> Debug.log "switches"
     in
-    sources
-        |> List.map (parse format)
-        |> List.map writeElm
-        |> List.map importResult
-        |> Cmd.batch
-
-
-operationGenerateSwitch : List PathAndContent -> Maybe (List Localized.LangCode) -> Cmd Never
-operationGenerateSwitch sources mlangs =
-    let
-        locales =
-            Maybe.withDefault [] mlangs
-    in
-    sources
-        |> List.map Tuple.second
-        |> Localized.Switch.generate locales
-        |> List.map slashifyModuleName
+    (modules |> List.map writeElm)
+        ++ switches
         |> List.map importResult
         |> Cmd.batch
 

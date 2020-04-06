@@ -11,6 +11,7 @@ module Localized.Writer.Module exposing
 
 import Flip exposing (flip)
 import Localized
+import Localized.Elm as Elm
 
 
 {-| Return the complete implementation for the Localized.Module, needs a function to implement each Localized.Element.
@@ -39,8 +40,8 @@ head { name } =
 
 
 importModule : Localized.Module -> Localized.SourceCode
-importModule { name } =
-    "import " ++ name ++ "\n"
+importModule { name, lang } =
+    "import " ++ Elm.modulePrefix ++ "." ++ name ++ "." ++ lang ++ "\n"
 
 
 importModuleExposingAll : Localized.Module -> Localized.SourceCode

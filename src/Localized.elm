@@ -1,6 +1,6 @@
 module Localized exposing
     ( Element(..), Meta, Static, Format, FormatComponent(..), ModuleName, Key, Comment, Value, Placeholder, Module, ModuleImplementation, SourceCode, LangCode, isEmptyFormatComponent, elementMeta, languageModuleName, namedModule
-    , FileFormat(..), buildModule, mapModuleName
+    , FileFormat(..), PathAndContent, buildModule, mapModuleName
     )
 
 {-| This module provides data structures describing localized string functions
