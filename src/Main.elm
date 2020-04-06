@@ -7,6 +7,7 @@ in the CSV and PO submodules.
 
 -}
 
+import CSV
 import CSV.Export
 import CSV.Import
 import Flip exposing (flip)
@@ -17,6 +18,7 @@ import Localized.Filename as Filename
 import Localized.Parser as Localized
 import Localized.Switch
 import Localized.Writer
+import PO
 import PO.Export
 import PO.Import
 import Platform exposing (worker)
