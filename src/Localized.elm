@@ -106,6 +106,7 @@ type alias PathAndContent =
 type alias Module =
     { name : ModuleName
     , elements : List Element
+    , lang : LangCode
     }
 
 
@@ -179,7 +180,7 @@ namedModule name =
 
 buildModule : ModuleName -> List Element -> Module
 buildModule name elements =
-    Module name elements
+    Module name elements ""
 
 
 mapModuleName : (ModuleName -> ModuleName) -> Module -> Module
