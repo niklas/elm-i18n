@@ -5,23 +5,31 @@ module Localized.Filename exposing
     , toElm
     , toElmWithLocale
     , toModuleName
+    , toModuleNameAndLangPostfix
+    , toModuleNameAndLangPrefix
     , toPO
     )
 
 import Flip exposing (flip)
+import Localized exposing (..)
 import Regex exposing (Regex)
 import String.Extra
 import Utils.Regex exposing (findFirst, regex)
 
 
-toCSV : String -> String
+toCSV : Module -> String
 toCSV =
-    String.toLower >> changeExt "csv"
+    toExtWithLangPrefix "csv"
 
 
-toPO : String -> String
+toPO : Module -> String
 toPO =
-    String.toLower >> changeExt "po"
+    toExtWithLangPrefix "po"
+
+
+toExtWithLangPrefix : String -> Module -> String
+toExtWithLangPrefix ext { name, lang } =
+    String.toLower lang ++ "/" ++ String.toLower name ++ "." ++ ext
 
 
 toModuleName : String -> String
@@ -46,9 +54,57 @@ toModuleName org =
                     org
 
 
-toElm : String -> String
-toElm moduleName =
-    (moduleName
+toModuleNameAndLangPrefix : String -> ( String, String )
+toModuleNameAndLangPrefix org =
+    let
+        ex =
+            "^([^/]+)/(.+)\\." ++ extensionEx ++ "$"
+    in
+    case org |> findFirst ex of
+        Nothing ->
+            ( org, "" )
+
+        Just match ->
+            case match.submatches of
+                [ Just langCode, Just slashyPath ] ->
+                    ( slashyPath
+                        |> String.split "/"
+                        |> List.map String.Extra.classify
+                        |> String.join "."
+                    , langCode |> String.toLower
+                    )
+
+                _ ->
+                    ( org, "" )
+
+
+toModuleNameAndLangPostfix : String -> ( String, String )
+toModuleNameAndLangPostfix org =
+    let
+        ex =
+            "^(.+)/([^/]+)\\." ++ extensionEx ++ "$"
+    in
+    case org |> findFirst ex of
+        Nothing ->
+            ( org, "" )
+
+        Just match ->
+            case match.submatches of
+                [ Just slashyPath, Just langCode ] ->
+                    ( slashyPath
+                        |> String.split "/"
+                        |> List.map String.Extra.classify
+                        |> String.join "."
+                    , langCode |> String.toLower
+                    )
+
+                _ ->
+                    ( org, "" )
+
+
+toElm : Module -> String
+toElm { name } =
+    (name
         |> String.split "."
         |> List.append [ "Translation" ]
         |> String.join "/"
@@ -56,12 +112,12 @@ toElm moduleName =
         ++ ".elm"
 
 
-toElmWithLocale : String -> String -> String
-toElmWithLocale locale moduleName =
-    (moduleName
+toElmWithLocale : Module -> String
+toElmWithLocale { name, lang } =
+    (name
         |> String.split "."
         |> List.append [ "Translation" ]
-        |> flip List.append [ locale ]
+        |> flip List.append [ lang ]
         |> String.join "/"
     )
         ++ ".elm"

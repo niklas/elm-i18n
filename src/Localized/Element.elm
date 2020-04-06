@@ -11,7 +11,7 @@ import PO.Export
 import PO.Import
 
 
-importFrom : FileFormat -> ( ModuleName, SourceCode ) -> Module
+importFrom : FileFormat -> ModuleName -> SourceCode -> List Element
 importFrom format =
     case format of
         CSV ->

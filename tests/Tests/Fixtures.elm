@@ -30,24 +30,21 @@ elements : List Element
 elements =
     [ Localized.ElementStatic
         { meta =
-            { moduleName = "Test"
-            , key = "myString"
+            { key = "myString"
             , comment = "MyComment"
             }
         , value = "Value"
         }
     , Localized.ElementStatic
         { meta =
-            { moduleName = "Test"
-            , key = "myString2"
+            { key = "myString2"
             , comment = "Multiline\ncomment"
             }
         , value = "Value2"
         }
     , Localized.ElementFormat
         { meta =
-            { moduleName = "Test"
-            , key = "myFormat"
+            { key = "myFormat"
             , comment = ""
             }
         , placeholders = [ "label" ]
@@ -72,16 +69,14 @@ elements4 : List Element
 elements4 =
     [ Localized.ElementStatic
         { meta =
-            { moduleName = "Test"
-            , key = "myString"
+            { key = "myString"
             , comment = "My comment"
             }
         , value = "Value"
         }
     , Localized.ElementFormat
         { meta =
-            { moduleName = "Test"
-            , key = "myFormat"
+            { key = "myFormat"
             , comment = ""
             }
         , placeholders = [ "label" ]
@@ -92,8 +87,7 @@ elements4 =
         }
     , Localized.ElementFormat
         { meta =
-            { moduleName = "Test"
-            , key = "myFormatAtBeginning"
+            { key = "myFormatAtBeginning"
             , comment = ""
             }
         , placeholders = [ "label" ]
@@ -104,8 +98,7 @@ elements4 =
         }
     , Localized.ElementFormat
         { meta =
-            { moduleName = "Test"
-            , key = "myFormatQuoted"
+            { key = "myFormatQuoted"
             , comment = ""
             }
         , placeholders = [ "label" ]
@@ -122,32 +115,28 @@ elements5 : List Element
 elements5 =
     [ Localized.ElementStatic
         { meta =
-            { moduleName = moduleName
-            , key = "myString"
+            { key = "myString"
             , comment = ""
             }
         , value = "Value"
         }
     , Localized.ElementStatic
         { meta =
-            { moduleName = moduleName
-            , key = "myString2"
+            { key = "myString2"
             , comment = ""
             }
         , value = "Value2"
         }
     , Localized.ElementStatic
         { meta =
-            { moduleName = moduleName
-            , key = "myStringC"
+            { key = "myStringC"
             , comment = "My comment with a-hyphen"
             }
         , value = "ValueC"
         }
     , Localized.ElementFormat
         { meta =
-            { moduleName = moduleName
-            , key = "myFormat"
+            { key = "myFormat"
             , comment = ""
             }
         , placeholders = [ "label" ]
@@ -158,8 +147,7 @@ elements5 =
         }
     , Localized.ElementFormat
         { meta =
-            { moduleName = moduleName
-            , key = "myFormat2"
+            { key = "myFormat2"
             , comment = "My formatted comment"
             }
         , placeholders = [ "argument" ]
@@ -170,8 +158,7 @@ elements5 =
         }
     , Localized.ElementStatic
         { meta =
-            { moduleName = moduleName
-            , key = "stringWithMultiLineComment"
+            { key = "stringWithMultiLineComment"
             , comment = "My comment over two\nlines."
             }
         , value = ""

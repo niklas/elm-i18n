@@ -28,8 +28,8 @@ You will usually use this output to create elm code:
         |> Localized.Writer.write
 
 -}
-generate : ( ModuleName, SourceCode ) -> Module
-generate ( moduleName, poString ) =
+generate : ModuleName -> SourceCode -> List Element
+generate moduleName poString =
     let
         allKeysWithModuleName =
             keys poString
@@ -67,4 +67,3 @@ generate ( moduleName, poString ) =
             element key (valueForKey key) (fullCommentForKey key)
         )
         allKeys
-        |> Localized.buildModule moduleName

@@ -16,16 +16,9 @@ import Localized.Writer.Module
 {-| Generate elm-source code for a module and its associated
 localized elements.
 -}
-generate : Localized.Module -> Localized.ModuleImplementation
+generate : Localized.Module -> Localized.SourceCode
 generate =
-    moduleImplementation
-
-
-moduleImplementation : Localized.Module -> Localized.ModuleImplementation
-moduleImplementation ({ name } as mod) =
-    ( name
-    , Localized.Writer.Module.implementation element mod
-    )
+    Localized.Writer.Module.implementation element
 
 
 element : Localized.Element -> Localized.SourceCode

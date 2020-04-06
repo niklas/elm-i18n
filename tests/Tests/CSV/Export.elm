@@ -11,7 +11,7 @@ testExport : Test
 testExport =
     test "testExport" <|
         \() ->
-            CSV.generate elements
+            CSV.generate { name = "Test", lang = "---", elements = elements }
                 |> Expect.equal expectedCSV
 
 

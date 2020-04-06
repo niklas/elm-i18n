@@ -11,7 +11,7 @@ testExport : Test
 testExport =
     test "testExport" <|
         \() ->
-            PO.generate elements
+            PO.generate { name = "Test", lang = "---", elements = elements }
                 |> Expect.equal expectedPO
 
 

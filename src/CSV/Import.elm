@@ -29,18 +29,18 @@ You will usually use this output to create elm code:
         |> Localized.Writer.write
 
 -}
-generate : ( ModuleName, SourceCode ) -> Module
-generate ( moduleName, csv ) =
+generate : ModuleName -> SourceCode -> List Element
+generate moduleName csv =
     case Csv.parse csv of
         Result.Ok lines ->
             generateForCsv moduleName lines
 
         Result.Err err ->
             Debug.log "Could not parse CSV" err
-                |> always (Localized.buildModule moduleName [])
+                |> always []
 
 
-generateForCsv : ModuleName -> Csv.Csv -> Module
+generateForCsv : ModuleName -> Csv.Csv -> List Element
 generateForCsv moduleName lines =
     let
         modules =
@@ -77,7 +77,7 @@ generateForCsv moduleName lines =
                 |> Maybe.withDefault []
     in
     -- Generate the source code for only out module, ignore the keys which don't belong here (warned above)
-    Localized.buildModule moduleName (generateForModule linesForThisModule)
+    generateForModule linesForThisModule
 
 
 generateForModule : List (List String) -> List Localized.Element
@@ -108,7 +108,7 @@ linesForModule moduleName lines =
 fromLine : List String -> Maybe Localized.Element
 fromLine columns =
     case columns of
-        key :: comment :: placeholders :: value :: xs ->
+        _ :: key :: comment :: placeholders :: value :: xs ->
             Just (code key comment placeholders value)
 
         _ ->

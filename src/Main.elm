@@ -7,18 +7,20 @@ in the CSV and PO submodules.
 
 -}
 
-import CSV
 import CSV.Export
 import CSV.Import
 import Flip exposing (flip)
 import Json.Decode
 import Localized exposing (..)
+import Localized.CSV as CSV
 import Localized.Element as Element
+import Localized.Elm as Elm
 import Localized.Filename as Filename
+import Localized.Module as Module
+import Localized.PO as PO
 import Localized.Parser as Localized
 import Localized.Switch
 import Localized.Writer
-import PO
 import PO.Export
 import PO.Import
 import Platform exposing (worker)
@@ -168,21 +170,21 @@ parse format ( fileName, content ) =
         parsed =
             case format of
                 CSV ->
-                    CSV.parse content
+                    CSV.parse
 
                 PO ->
-                    PO.parse content
+                    PO.parse
     in
-    Module moduleName lang <| parsed content
+    { name = moduleName, lang = lang, elements = parsed moduleName content }
 
 
 parseElm : PathAndContent -> Module
 parseElm ( fileName, content ) =
     let
         ( moduleName, lang ) =
-            Filename.toModuleNameAndLang fileName
+            Filename.toModuleNameAndLangPostfix fileName
     in
-    Module moduleName lang <| Elm.parse
+    { name = moduleName, lang = lang, elements = Elm.parse content }
 
 
 write : FileFormat -> Module -> PathAndContent
