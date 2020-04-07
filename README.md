@@ -1,6 +1,6 @@
 # i18n localization for Elm
 
-[![Travis](https://travis-ci.org/niklas/elm-i18n.svg?branch=master)](https://travis-ci.org/iosphere/elm-i18n)
+[![Travis](https://travis-ci.org/niklas/elm-i18n.svg?branch=master)](https://travis-ci.org/niklas/elm-i18n)
 
 elm-i18n provides tools and a concept for localizing elm apps. The idea is to
 treat localized text as constants (or functions). To achieve this, localized
