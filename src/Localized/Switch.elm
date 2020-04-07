@@ -125,6 +125,8 @@ elementSource moduleName mods element =
                         (tab ++ tab)
                             ++ l
                             ++ " -> "
+                            ++ Elm.modulePrefix
+                            ++ "."
                             ++ moduleName
                             ++ "."
                             ++ l
