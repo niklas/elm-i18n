@@ -14,6 +14,7 @@ lint-js-fix: $(JS_FILES) ## Check javascript file for linter warnings and fix if
 build: $(ELM_FILES)
 	elm make src/Main.elm --output build/elm.js
 
+# we don't use --optimize here, because we use Debug.log as facility to warn about (slightly) malformed po/csv files.
 dist: $(ELM_FILES)
 	elm make src/Main.elm --output dist/elm.js
 
