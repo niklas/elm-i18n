@@ -102,7 +102,7 @@ elementSource moduleName mods element =
                         (tab ++ tab)
                             ++ l
                             ++ " -> "
-                            ++ Elm.modulePrefix
+                            ++ Writer.modulePrefix
                             ++ "."
                             ++ moduleName
                             ++ "."
@@ -125,7 +125,7 @@ mainModule languages =
     in
     ( name
     , "module "
-        ++ Elm.modulePrefix
+        ++ Writer.modulePrefix
         ++ " exposing (Language(..))\n\n"
         ++ "type Language = "
         ++ String.join " | " languages

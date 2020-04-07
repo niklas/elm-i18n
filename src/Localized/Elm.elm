@@ -1,16 +1,17 @@
-module Localized.Elm exposing (modulePrefix, parse, parseFileName)
+module Localized.Elm exposing (parse, parseFileName, write)
 
 import Localized exposing (..)
-import Localized.Parser
+import Localized.Parser as Parser
+import Localized.Writer as Writer
 
 
 parse : SourceCode -> List Element
 parse =
-    Localized.Parser.parse
+    Parser.parse
 
 
-modulePrefix =
-    "Translation"
+write =
+    Writer.generate
 
 
 parseFileName =

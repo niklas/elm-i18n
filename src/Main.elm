@@ -16,7 +16,6 @@ import Localized.CSV as CSV
 import Localized.Element as Element
 import Localized.Elm as Elm
 import Localized.Filename as Filename
-import Localized.Module as Module
 import Localized.PO as PO
 import Localized.Parser as Localized
 import Localized.Switch
@@ -185,10 +184,10 @@ write format modul =
         content =
             case format of
                 CSV ->
-                    Module.toCSV modul
+                    CSV.write modul
 
                 PO ->
-                    Module.toPO modul
+                    PO.write modul
     in
     ( fileName, content )
 
@@ -200,6 +199,6 @@ writeElm modul =
             Filename.toElmWithLocale modul
 
         content =
-            Module.toElm modul
+            Elm.write modul
     in
     ( fileName, content )

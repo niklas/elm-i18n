@@ -4,6 +4,7 @@ module Localized.Writer.Module exposing
     , implementation
     , importModule
     , importModuleExposingAll
+    , modulePrefix
     )
 
 {-| Provides code generation for Localized.Modules
@@ -11,7 +12,6 @@ module Localized.Writer.Module exposing
 
 import Flip exposing (flip)
 import Localized
-import Localized.Elm as Elm
 
 
 {-| Return the complete implementation for the Localized.Module, needs a function to implement each Localized.Element.
@@ -56,7 +56,11 @@ fullModuleName : Localized.Module -> String
 fullModuleName { name, lang } =
     String.join "." <|
         if lang == "" then
-            [ Elm.modulePrefix, name ]
+            [ modulePrefix, name ]
 
         else
-            [ Elm.modulePrefix, name, lang ]
+            [ modulePrefix, name, lang ]
+
+
+modulePrefix =
+    "Translation"
