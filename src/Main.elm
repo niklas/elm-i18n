@@ -118,7 +118,6 @@ operationImport sources mlangs format =
         switches =
             modules
                 |> Localized.Switch.generate locales
-                |> Debug.log "switches"
     in
     (modules |> List.map writeElm)
         ++ switches
@@ -198,7 +197,7 @@ writeElm : Module -> PathAndContent
 writeElm modul =
     let
         fileName =
-            Filename.toElm modul
+            Filename.toElmWithLocale modul
 
         content =
             Module.toElm modul

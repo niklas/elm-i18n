@@ -32,16 +32,15 @@ elements functionImplementation mod =
 
 
 head : Localized.Module -> Localized.SourceCode
-head { name } =
+head mod =
     "module "
-        ++ "Translation."
-        ++ name
+        ++ fullModuleName mod
         ++ " exposing (..)\n\n{-| -}\n\n"
 
 
 importModule : Localized.Module -> Localized.SourceCode
-importModule { name, lang } =
-    "import " ++ Elm.modulePrefix ++ "." ++ name ++ "." ++ lang ++ "\n"
+importModule mod =
+    "import " ++ fullModuleName mod ++ "\n"
 
 
 importModuleExposingAll : Localized.Module -> Localized.SourceCode
@@ -49,3 +48,13 @@ importModuleExposingAll { name } =
     "import "
         ++ name
         ++ " exposing (..)\n"
+
+
+fullModuleName : Localized.Module -> String
+fullModuleName { name, lang } =
+    String.join "." <|
+        if lang == "" then
+            [ Elm.modulePrefix, name ]
+
+        else
+            [ Elm.modulePrefix, name, lang ]
