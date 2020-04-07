@@ -1,27 +1,26 @@
-# i18n localization for Elm as a pre-build phase
+# i18n localization for Elm
 
-[![Travis](https://travis-ci.org/iosphere/elm-i18n.svg?branch=master)](https://travis-ci.org/iosphere/elm-i18n)
-[![npm version](https://badge.fury.io/js/elm-i18n.svg)](https://badge.fury.io/js/elm-i18n)
+[![Travis](https://travis-ci.org/niklas/elm-i18n.svg?branch=master)](https://travis-ci.org/iosphere/elm-i18n)
 
 elm-i18n provides tools and a concept for localizing elm apps. The idea is to
 treat localized text as constants (or functions). To achieve this, localized
 content is placed in separate modules. Each language can consist of
 multiple modules, but each module contains only one language.
 
-**The correct set of language modules is symlinked or copied into place before
-compiling the elm app. The result is a localized compiled version of your app.**
-When repeating this process for multiple languages the compiler re-uses the
-cache and only the translation specific modules are cleared from the cache.
-
 The elm-package is aimed at tool developers who want to parse elm-code into
 localized elements, read or write CSV or PO files. **If you want to use this
 tool for your elm-project you only need the information in this README.**
 
+This is a fork from [iosphere](https://github.com/iosphere/elm-i18n) which took
+a different approach: Instead of providing all translation on runtime, you'd
+build an app for each of your locales, switching between them at build-time
+using symlinks. It does not seem to be maintained anymore, and the author did
+not want to switch paradigms at that time.
+
 ## Features:
 
 * Switch languages:
-    * Switch the language of your elm app before building
-    * Easily build multiple localized version of your app
+    * Switch the language of your elm app at runtime
 *   `CSV <-> ELM <-> PO`
     * Generate **CSV** and **PO** files from your localization module's elm code
     * Generate your localization module's elm code from CSV and PO files
@@ -30,48 +29,31 @@ tool for your elm-project you only need the information in this README.**
 
 ## Suggested project file structure
 
-Note that the language identifier is only included in the directory name and
-excluded from the Translation module names:
+Note that the language identifier is included in the directory name and in the
+Translation module names:
 
 ```
 project
-├── src/
-│   ├── Main.elm (e.g. imports Translation.Main)
-│   ├── View.elm (e.g. imports Translation.View)
-│   └──>Translation (sym-linked to current directory, e.g. project/Translation/De/)
-└── Translation/
-    ├── De/
-    │   ├── Main.elm (module Translation.Main)
-    │   └── View.elm (module Translation.View)
-    └── En/
-        ├── Main.elm (module Translation.Main)
-        └── View.elm (module Translation.View)
+└── src/
+    ├── Main.elm (e.g. imports Translation.Main)
+    ├── View.elm (e.g. imports Translation.View)
+    ├── Translation.elm (contains the available languages as Type)
+    └── Translation/ (contains a file and directory for each section)
+        ├── Main/
+        │   ├── De.elm (module Translation.Main.De)
+        │   └── En.elm (module Translation.Main.En)
+        ├── View/
+        │   ├── De.elm (module Translation.View.De)
+        │   └── En.elm (module Translation.View.En)
+        ├── Main.elm (module Translation.Main -- must pass the current locale)
+        └── View.elm (module Translation.View -- as first argument to all functions)
 ```
 
 ## Installation:
 
 The tool-set is available as a node package and is backed by elm code:
 
-`npm install elm-i18n -g`
-
-## Switch language as a prebuild phase
-
-In order to switch the language for compilation to `En`, simply execute the
-following command at the root of your elm app:
-
-`elm-i18n-switch -l En`
-
-To switch the language and compile a localized version of your app (to `dist/en.js`):
-
-`elm-i18n-switch -l En --output dist`
-
-If your code is not stored in `src` or your main app module is not `Main.elm`:
-
-`elm-i18n-switch -l En --output dist --src myDir --elmFile MyMain.elm`
-
-If your root `Translation` module is called `MyTranslation`:
-
-`elm-i18n-switch -l En --rootModule MyTranslation`
+`yarn add https://github.com/niklas/elm-i18n.git`
 
 
 ## Codegen tools
@@ -85,7 +67,7 @@ modules, but each module only contains one language).
 #### Export: Generate CSV from Elm source
 
 ```bash
-elm-i18n-generator --format CSV --root example/Translation --language De --export
+elm-i18n-generator --format CSV --root your/app/src/Translation/ --language De --export --exportOutput i18n/
 ```
 
 Result:
@@ -99,13 +81,13 @@ Module,Key,Comment,Supported Placeholders,Translation
 #### Import: Generate Elm source code from CSV
 
 ```bash
-elm-i18n-generator --format CSV -l De --import export.csv
+elm-i18n-generator --format CSV -l De --import i18n/ --importOutput you/app/src
 ```
 
-Result in `import/De/Translation/Main.elm`:
+Result in `your/app/src/Translation/Main/De.elm`:
 
 ```elm
-module Translation.Main exposing (..)
+module Translation.Main.De exposing (..)
 
 {-| -}
 
@@ -125,6 +107,25 @@ greetingWithName name =
         ++ name
 ```
 
+And a switching file `your/app/src/Translation/Main.elm`:
+
+```elm
+module Translation.Main exposing (..)
+
+import Translation exposing (..)
+import Translation.Main.De
+
+greeting : Language -> String
+greeting language =
+    case language of
+        De -> Translation.Main.De.greeting
+
+greetingWithName : Language -> String -> String
+greetingWithName language =
+    case language of
+        De -> Translation.Main.De.greetingWithName
+```
+
 ### PO
 
 For more information about the PO file format visit:
@@ -133,7 +134,7 @@ https://www.gnu.org/savannah-checkouts/gnu/gettext/manual/html_node/PO-Files.htm
 #### Export: Generate PO from Elm source:
 
 ```bash
-elm-i18n-generator --format PO --root example/Translation --language De --export
+elm-i18n-generator --format PO --root your/app/src/Translation/ --language De --export --exportOutput i18n/
 ```
 
 Result:
@@ -152,10 +153,10 @@ msgstr "Guten Tag, %(name)s"
 #### Import: Generate Elm source code from PO
 
 ```bash
-elm-i18n-generator --format PO --language De --import export.po
+elm-i18n-generator --format PO -l De --import i18n/ --importOutput you/app/src
 ```
 
-Results in the same `import/De/Translation/Main.elm`
+Results in the same `import/Translation/Main/De.elm`
 as in the [CSV example](#import-generate-elm-source-code-from-csv).
 
 
@@ -164,49 +165,7 @@ as in the [CSV example](#import-generate-elm-source-code-from-csv).
 Pass all the languages you want to switch between as a comma-separated list.
 
 ```bash
-elm-i18n-generator --language De,Pl,En,Fr --genswitch
-```
-
-#### Migrate legacy symlinked translations to switchables
-
-Remove the legacy symlink
-```
-rm src/Translation
-```
-
-Export each of your languages to CSV temporarily
-```
-mkdir languages
-elm-i18n.generator --format CSV --language En --root Translation/ --export --exportOutput languages/en.csv
-```
-
-Then, import them again.
-```
-elm-i18n-generator --format CSV --language En --importOutput src --import languages/en.csv
-```
-
-
-Finally, generate the switch
-```
-elm-i18n-generator --language De,En --genswitch --importOutput . --root src
-```
-
-After this your Project should look like this:
-
-```
-project
-└── src/
-    ├── Main.elm (e.g. imports Translation.Main)
-    ├── View.elm (e.g. imports Translation.View)
-    └── Translation
-        ├── Main.elm (module Translation.Main)
-        ├── View.elm (module Translation.View)
-        ├── Main/
-        │   ├── De.elm (module Translation.Main.De)
-        │   └── En.elm (module Translation.View.En)
-        └── View/
-            ├── De.elm (module Translation.Main.De)
-            └── En.elm (module Translation.View.En)
+elm-i18n-generator --language De,Pl,En,Fr
 ```
 
 Use the `Language` type to dynamically translate your websites:
@@ -214,6 +173,7 @@ Use the `Language` type to dynamically translate your websites:
 
 ```
 import Translation exposing (Language(..))
+import Translation.Main as T
 
 state =
     { language = Language
@@ -221,16 +181,15 @@ state =
 
 render state =
     div []
-        [ text (Translation.Main.greetingWithName state.language "Leonard")
+        [ text (T.greetingWithName state.language "Leonard")
         , text "and in German:"
-        , text (Translation.Main.greetingWithName De "Leonard")
+        , text (T.greetingWithName De "Leonard")
         ]
 ```
 
 ## Advantages
 
-+ Each build of your app only contains one language.
-+ No need to handle the current language in your elm app's model or view functions.
++ Switch the app's locale on the fly
 + You can use any logic you like for the text snippets: constants, functions...
 + Allows you to create sub modules for parts of your app.
 + Full type safety
@@ -248,12 +207,7 @@ render state =
 
 ## Disadvantages
 
-- Language is no longer part of your view model and cannot be changed dynamically from within the app.
-  *However, you can add a constant with the current language code and have different code paths if that
-  is required.*
-- Language selection has to be handled outside of the elm-app (by loading the appropriate js artefact).
-
-[An issue has been created to address this disadvantage.](https://github.com/iosphere/elm-i18n/issues/2)
+- Bigger footprint of your app, containing constants for all available languages
 
 ## Building elm-i18n
 
