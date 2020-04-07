@@ -131,6 +131,8 @@ greetingWithName language =
 For more information about the PO file format visit:
 https://www.gnu.org/savannah-checkouts/gnu/gettext/manual/html_node/PO-Files.html
 
+*CAVEAT* every PO file as to end with two newlines (one complete empty line). If they don't, the last entry's value won't be found.
+
 #### Export: Generate PO from Elm source:
 
 ```bash
