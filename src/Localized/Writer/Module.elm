@@ -35,7 +35,9 @@ head : Localized.Module -> Localized.SourceCode
 head mod =
     "module "
         ++ fullModuleName mod
-        ++ " exposing (..)\n\n{-| -}\n\n"
+        ++ " exposing ("
+        ++ (mod.elements |> List.map (Localized.elementMeta .key) |> String.join ", ")
+        ++ ")\n\n{-| -}\n\n"
 
 
 importModule : Localized.Module -> Localized.SourceCode
