@@ -12,7 +12,9 @@ const argv = require("yargs")
     .option("language", {alias: "l", describe: "The language code of the current operation. This should match a file."})
     .option("root", {default: "Translation", describe: "The root to the translation modules. This script expects this directory to contain a file for each language."})
     .demand("language")
-    .boolean(["export"])
+    .boolean("export")
+		.option("runFormat", {default: false, describe: "Run elm-format on each of the generated Elm files (slow)."})
+		.boolean("runFormat")
     .help()
     .argv;
 const Elm = require("./dist/elm.js");
@@ -128,15 +130,20 @@ function handleImport([filePath, resultString]) {
     }
 
     let targetPath = path.join(currentDir, argv.importOutput, filePath);
-		let tmpfile = tmp.fileSync({template: "elm-i18n-XXXXXX.elm"});
-		writeFile(tmpfile.name, resultString);
-		let format = childProcess.spawnSync('elm-format', [tmpfile.name, '--yes', '--elm-version=0.19', "--output", targetPath]);
-		if (format.error) {
-				console.log("Could not format elm code:", format.error.message);
-				writeFile(targetPath, resultString);
-		} else if (format.status && format.stderr) {
-				console.log(format.stderr.toString());
-				writeFile(targetPath, resultString);
+		let directWrite = () => {writeFile(targetPath, resultString); }
+		if (argv.runFormat) {
+				let tmpfile = tmp.fileSync({template: "elm-i18n-XXXXXX.elm"});
+				writeFile(tmpfile.name, resultString);
+				let format = childProcess.spawnSync('elm-format', [tmpfile.name, '--yes', '--elm-version=0.19', "--output", targetPath]);
+				if (format.error) {
+						console.log("Could not format elm code:", format.error.message);
+						directWrite();
+				} else if (format.status && format.stderr) {
+						console.log(format.stderr.toString());
+						directWrite();
+				}
+		} else {
+				directWrite();
 		}
     console.log("Finished writing file to:", targetPath);
 }
