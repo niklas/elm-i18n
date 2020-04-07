@@ -1,7 +1,7 @@
 module Localized.Element exposing
     ( exportTo
+    , getKey
     , importFrom
-    , isEqual
     )
 
 import CSV.Export
@@ -46,17 +46,11 @@ listDropRight n =
     List.reverse << List.drop 1 << List.reverse
 
 
-isEqual : Element -> Element -> Bool
-isEqual e1 e2 =
-    case ( e1, e2 ) of
-        ( Localized.ElementFormat _, Localized.ElementStatic _ ) ->
-            False
+getKey : Element -> String
+getKey element =
+    case element of
+        ElementFormat e ->
+            e.meta.key
 
-        ( Localized.ElementStatic _, Localized.ElementFormat _ ) ->
-            False
-
-        ( Localized.ElementStatic m1, Localized.ElementStatic m2 ) ->
-            m1.meta.key == m2.meta.key
-
-        ( Localized.ElementFormat m1, Localized.ElementFormat m2 ) ->
-            m1.meta.key == m2.meta.key
+        ElementStatic e ->
+            e.meta.key

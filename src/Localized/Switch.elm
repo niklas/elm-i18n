@@ -8,6 +8,7 @@ module Localized.Switch exposing (generate)
 -}
 
 import Dict exposing (Dict)
+import List.Extra
 import Localized exposing (..)
 import Localized.Element as Element
 import Localized.Elm as Elm
@@ -27,7 +28,7 @@ generate languages modules =
                     (\( moduleName, mods ) ->
                         let
                             elements =
-                                mods |> List.map .elements |> flatten2D |> unique
+                                mods |> List.map .elements |> flatten2D |> List.Extra.uniqueBy Element.getKey
 
                             switchModule =
                                 Localized.buildModule moduleName elements
@@ -37,33 +38,9 @@ generate languages modules =
            )
 
 
-unique : List Element -> List Element
-unique elements =
-    u elements []
-
-
-u : List Element -> List Element -> List Element
-u list have =
-    case list of
-        e :: rest ->
-            if member e have then
-                u rest have
-
-            else
-                u rest (e :: have)
-
-        [] ->
-            have
-
-
 flatten2D : List (List a) -> List a
 flatten2D list =
-    List.foldr (++) [] list
-
-
-member : Element -> List Element -> Bool
-member e list =
-    List.any (Element.isEqual e) list
+    List.foldl (++) [] list
 
 
 indexBy : (a -> comparable) -> List a -> Dict comparable (List a)
