@@ -145,7 +145,9 @@ mainModule languages =
             Localized.namedModule name
     in
     ( name
-    , Writer.head mod
+    , "module "
+        ++ Elm.modulePrefix
+        ++ " exposing (Language(..))\n\n"
         ++ "type Language = "
         ++ String.join " | " languages
         ++ "\n"
