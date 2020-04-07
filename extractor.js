@@ -20,6 +20,8 @@ const fs = require("fs-extra");
 const path = require("path");
 const glob = require("glob");
 const mkdirp = require("mkdirp");
+const childProcess = require('child_process');
+const tmp = require('tmp');
 
 if (!argv.export && !argv.import && !argv.genswitch) {
     console.error("Please provide import, export or genswitch option");
@@ -126,7 +128,16 @@ function handleImport([filePath, resultString]) {
     }
 
     let targetPath = path.join(currentDir, argv.importOutput, filePath);
-		//writeFile(targetPath, resultString);
+		let tmpfile = tmp.fileSync({template: "elm-i18n-XXXXXX.elm"});
+		writeFile(tmpfile.name, resultString);
+		let format = childProcess.spawnSync('elm-format', [tmpfile.name, '--yes', '--elm-version=0.19', "--output", targetPath]);
+		if (format.error) {
+				console.log("Could not format elm code:", format.error.message);
+				writeFile(targetPath, resultString);
+		} else if (format.status && format.stderr) {
+				console.log(format.stderr.toString());
+				writeFile(targetPath, resultString);
+		}
     console.log("Finished writing file to:", targetPath);
 }
 
