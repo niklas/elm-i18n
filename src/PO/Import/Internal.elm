@@ -198,7 +198,10 @@ values poString moduleName allKeys =
                     |> List.head
                     |> Utils.Regex.submatchAt 0
                     |> Maybe.withDefault ""
-                    |> String.trim
+                    |> String.lines
+                    |> List.map String.trim
+                    |> List.map String.Extra.unquote
+                    |> String.join ""
                     |> Tuple.pair key
             )
         |> Dict.fromList

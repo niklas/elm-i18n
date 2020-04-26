@@ -5778,6 +5778,7 @@ var $elm$core$Tuple$second = function (_v0) {
 	var y = _v0.b;
 	return y;
 };
+var $elm$core$String$lines = _String_lines;
 var $author$project$PO$Import$Internal$regexForValue = function (key) {
 	return A2(
 		$elm$core$Maybe$withDefault,
@@ -5793,20 +5794,29 @@ var $author$project$PO$Import$Internal$values = F3(
 					return A2(
 						$elm$core$Tuple$pair,
 						key,
-						$elm$core$String$trim(
+						A2(
+							$elm$core$String$join,
+							'',
 							A2(
-								$elm$core$Maybe$withDefault,
-								'',
+								$elm$core$List$map,
+								$elm_community$string_extra$String$Extra$unquote,
 								A2(
-									$author$project$Utils$Regex$submatchAt,
-									0,
-									$elm$core$List$head(
-										A3(
-											$elm$regex$Regex$findAtMost,
-											1,
-											$author$project$PO$Import$Internal$regexForValue(
-												A2($author$project$PO$Import$Internal$fullKey, moduleName, key)),
-											poString))))));
+									$elm$core$List$map,
+									$elm$core$String$trim,
+									$elm$core$String$lines(
+										A2(
+											$elm$core$Maybe$withDefault,
+											'',
+											A2(
+												$author$project$Utils$Regex$submatchAt,
+												0,
+												$elm$core$List$head(
+													A3(
+														$elm$regex$Regex$findAtMost,
+														1,
+														$author$project$PO$Import$Internal$regexForValue(
+															A2($author$project$PO$Import$Internal$fullKey, moduleName, key)),
+														poString)))))))));
 				},
 				allKeys));
 	});
